@@ -1,99 +1,75 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import List, Tuple
+from typing import List
 
 
 class PAA:
-    """
-    Class implementing the Piecewise Aggregate Approximation algorithm for univariate time series.
-    """
+    def __init__(self, window_size: int) -> None:
+        self.window_size = window_size
+        self.n_windows = None
 
-    def __init__(self, num_segments: int):
+    def fit(self, X: np.ndarray) -> None:
         """
-        Parameters:
-        -----------
-        num_segments: int
-            The number of segments to use in the PAA representation of the time series.
+        Compute the number of windows for the input time series.
+        :param X: np.ndarray, shape (n_samples,)
+            The input time series.
         """
-        self.num_segments = num_segments
+        n_samples = len(X)
+        self.n_windows = n_samples // self.window_size
 
-    def fit_transform(self, ts: np.ndarray) -> np.ndarray:
-        """
-        Computes the PAA representation of a given time series.
+        if self.n_windows == 0:
+            raise ValueError("Window size is too large for the input time series.")
 
-        Parameters:
-        -----------
-        ts: np.ndarray
-            The time series to be transformed.
-
-        Returns:
-        --------
-        np.ndarray
-            The PAA representation of the time series.
+    def transform(self, X: np.ndarray) -> np.ndarray:
         """
-        if not isinstance(ts, np.ndarray):
-            raise TypeError("Time series must be a numpy array.")
-        if ts.ndim != 1:
-            raise ValueError("Time series must be univariate.")
-        if len(ts) < self.num_segments:
+        Transform the input time series using Piecewise Aggregate Approximation (PAA).
+        :param X: np.ndarray, shape (n_samples,)
+            The input time series.
+        :return: np.ndarray, shape (n_windows,)
+            The PAA segments obtained by averaging each window.
+        """
+        if self.n_windows is None:
             raise ValueError(
-                "Number of segments must be smaller than the time series length."
+                "The fit method has not been called yet. Please call fit before transform."
             )
 
-        n = len(ts)
-        seg_size = n // self.num_segments
-        remainder = n % self.num_segments
+        # reshape X into windows
+        X_windows = X[: self.n_windows * self.window_size].reshape(
+            self.n_windows, self.window_size
+        )
 
-        if remainder == 0:
-            ts_paa = np.mean(ts.reshape(self.num_segments, seg_size), axis=1)
-        else:
-            ts_paa = np.concatenate(
-                (
-                    np.mean(ts[:remainder].reshape(seg_size + 1, -1), axis=1),
-                    np.mean(ts[remainder:].reshape(seg_size, -1), axis=1),
-                )
-            )
+        # compute mean of each window
+        paa_segments = np.mean(X_windows, axis=1)
 
-        # Repeat the PAA values for each segment to obtain the PAA representation of the whole time series
-        ts_paa = np.repeat(ts_paa, seg_size)
-        ts_paa = np.concatenate((ts_paa, np.repeat(ts_paa[-1], remainder)))
+        return paa_segments
 
-        return ts_paa
+    def plot(self, X: np.ndarray) -> None:
+        """
+        Plot the PAA segments obtained from an input time series.
+        :param X: np.ndarray, shape (n_samples,)
+            The input time series.
+        """
+        self.fit(X)
+        paa_segments = self.transform(X)
 
+        # plot original time series
+        plt.plot(X)
 
-def generate_random_ts(n: int) -> np.ndarray:
-    """
-    Generates a random univariate time series of given length.
+        # plot vertical lines with a gap of window size
+        for i in range(1, self.n_windows):
+            plt.axvline(i * self.window_size - 0.5, color="gray", linestyle="--")
 
-    Parameters:
-    -----------
-    n: int
-        The length of the time series to be generated.
+        # plot PAA segments
+        plt.plot(np.repeat(paa_segments, self.window_size))
 
-    Returns:
-    --------
-    np.ndarray
-        The generated time series.
-
-    """
-    return np.random.randn(n)
+        plt.show()
 
 
-def plot_paa(ts: np.ndarray, ts_paa: np.ndarray, num_segments: int):
-    """
-    Plots a time series and its PAA representation on the same plot.
+# Example usage:
+# X = np.random.randn(100)
+# paa = PAA(window_size=10)
+# paa.fit(X)
+# paa_segments = paa.transform(X)
+# print(paa_segments)
 
-    Parameters:
-    -----------
-    ts: np.ndarray
-        The original time series to be plotted.
-    ts_paa: np.ndarray
-        The PAA representation of the time series to be plotted.
-    num_segments: int
-        The number of segments used to compute the PAA representation.
-
-    """
-    plt.plot(ts, label="Original")
-    plt.plot(ts_paa, label=f"PAA ({num_segments} segments)")
-    plt.legend()
-    plt.show()
+# paa.plot(X)
