@@ -4,4 +4,5 @@ matplotlib~=3.7.1
 scikit-learn~=1.2.2
 numba~=0.57.0
 tiktoken~=0.3.3
+tqdm~=4.65.0
 torch~=2.0.0
