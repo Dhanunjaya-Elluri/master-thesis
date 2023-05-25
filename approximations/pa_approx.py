@@ -63,13 +63,3 @@ class PAA:
         plt.plot(np.repeat(paa_segments, self.window_size))
 
         plt.show()
-
-
-# Example usage:
-# X = np.random.randn(100)
-# paa = PAA(window_size=10)
-# paa.fit(X)
-# paa_segments = paa.transform(X)
-# print(paa_segments)
-
-# paa.plot(X)

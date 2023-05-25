@@ -30,6 +30,11 @@ class LloydMaxQuantizer:
             init_codewords (str, optional): Initialization method for codewords. Either 'random' or 'kmeans++'.
                                             Defaults to 'random'.
         """
+        assert init_codewords in [
+            "random",
+            "kmeans++",
+        ], "Invalid Codewords initialization. Supported initializations: 'random', 'kmeans++'."
+
         self.x = x
         self.density = density
         self.n_codewords = n_codewords
@@ -78,10 +83,10 @@ class LloydMaxQuantizer:
                 else:
                     numerator, _ = integrate.quad(
                         lambda t: t * self.density(t), boundaries[i], boundaries[i + 1]
-                    )
+                    )[0]
                     denominator, _ = integrate.quad(
                         self.density, boundaries[i], boundaries[i + 1]
-                    )
+                    )[0]
                     codewords[i] = numerator / denominator
 
             # Compute delta and see if it decreases
@@ -173,7 +178,7 @@ class LloydMaxQuantizer:
         Returns:
             np.ndarray: Probabilities based on distances.
         """
-        return 1 / distances
+        return 1.0 / distances
 
     @staticmethod
     def _sample_new_codeword(
