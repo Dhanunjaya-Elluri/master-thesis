@@ -11,8 +11,8 @@ class PAA:
     def fit(self, X: np.ndarray) -> None:
         """
         Compute the number of windows for the input time series.
-        :param X: np.ndarray, shape (n_samples,)
-            The input time series.
+        Args:
+            X (np.ndarray): The input time series.
         """
         n_samples = len(X)
         self.n_windows = n_samples // self.window_size
@@ -23,10 +23,10 @@ class PAA:
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
         Transform the input time series using Piecewise Aggregate Approximation (PAA).
-        :param X: np.ndarray, shape (n_samples,)
-            The input time series.
-        :return: np.ndarray, shape (n_windows,)
-            The PAA segments obtained by averaging each window.
+        Args:
+            X (np.ndarray): The input time series.
+        Returns:
+            np.ndarray: The PAA segments obtained by averaging each window.
         """
         if self.n_windows is None:
             raise ValueError(
@@ -46,8 +46,8 @@ class PAA:
     def plot(self, X: np.ndarray) -> None:
         """
         Plot the PAA segments obtained from an input time series.
-        :param X: np.ndarray, shape (n_samples,)
-            The input time series.
+        Args:
+            X (np.ndarray): The input time series.
         """
         self.fit(X)
         paa_segments = self.transform(X)

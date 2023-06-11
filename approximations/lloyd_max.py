@@ -66,7 +66,7 @@ class LloydMaxQuantizer:
         boundaries[-1] = np.inf
 
         # Run for specified epochs
-        for _ in range(self.epochs):
+        for epoch in range(self.epochs):
             boundaries_before = boundaries[1:-1].copy()
             codewords_before = codewords.copy()
 
@@ -83,10 +83,10 @@ class LloydMaxQuantizer:
                 else:
                     numerator, _ = integrate.quad(
                         lambda t: t * self.density(t), boundaries[i], boundaries[i + 1]
-                    )[0]
+                    )
                     denominator, _ = integrate.quad(
                         self.density, boundaries[i], boundaries[i + 1]
-                    )[0]
+                    )
                     codewords[i] = numerator / denominator
 
             # Compute delta and see if it decreases
@@ -96,7 +96,7 @@ class LloydMaxQuantizer:
             if self.verbose:
                 print(
                     "Epoch:",
-                    _,
+                    epoch,
                     "Boundaries Delta:",
                     boundaries_delta,
                     "Codewords Delta:",
