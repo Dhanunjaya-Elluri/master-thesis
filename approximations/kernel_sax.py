@@ -34,10 +34,10 @@ class KernelSAX:
         self.random_state = random_state
         self.is_fitted = False
 
-    def estimate_density(self) -> Callable[[float], float]:
+    def estimate_density(self, paa_segments: np.ndarray) -> Callable[[float], float]:
         kde = KernelDensity(kernel=self.kernel, bandwidth=self.bandwidth)
-        kde.fit(self.x.reshape(-1, 1))
-        density = lambda x: np.exp(kde.score_samples([[x]]))
+        kde.fit(paa_segments.reshape(-1, 1))
+        density = lambda t: np.exp(kde.score_samples([[t]]))
         return density
 
     def find_cut_points(self, paa_window_size: int) -> np.ndarray:
@@ -47,7 +47,7 @@ class KernelSAX:
         paa.fit(self.x)
         paa_segments = paa.transform(self.x)
 
-        density = self.estimate_density()
+        density = self.estimate_density(paa_segments)
         quantizer = LloydMaxQuantizer(
             paa_segments,
             density,
@@ -55,6 +55,7 @@ class KernelSAX:
             self.epochs,
             self.verbose,
             self.random_state,
+            "kmeans++",
         )
         self.boundaries, self.codewords = quantizer.fit()
         self.is_fitted = True
