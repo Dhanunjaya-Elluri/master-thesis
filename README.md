@@ -1,3 +1,5 @@
+![tests](https://github.com/Dhanunjaya-Elluri/master-thesis/actions/workflows/tests.yaml/badge.svg)
+
 # Master's Thesis
 
 ## Transformers for quantized time series forecasting (Work in progress)
