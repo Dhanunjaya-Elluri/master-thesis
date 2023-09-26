@@ -1,3 +1,9 @@
+"""Lloyd-Max quantizer implementation."""
+
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+
+
 import numpy as np
 from scipy import integrate
 from typing import Optional, Tuple, List, Callable
@@ -139,7 +145,7 @@ class LloydMaxQuantizer:
         Returns:
             np.ndarray: Codewords initialized using k-means++.
         """
-        codewords = np.zeros((self.n_codewords))
+        codewords = np.zeros(self.n_codewords)
         codewords[0] = rng.uniform(c_min, c_max)
 
         for j in range(1, self.n_codewords):
@@ -166,6 +172,8 @@ class LloydMaxQuantizer:
         for i in range(len(codewords)):
             distances += np.abs(x - codewords[i])
         return distances
+        # distances = np.abs(x[:, np.newaxis] - codewords)  # Calculate absolute differences
+        # return distances
 
     @staticmethod
     def _calculate_probabilities(distances: np.ndarray) -> np.ndarray:

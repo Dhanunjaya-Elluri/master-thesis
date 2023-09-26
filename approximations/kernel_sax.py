@@ -1,21 +1,25 @@
+"""Kernel SAX (K-SAX) is a kernel-based approximation technique for time series data."""
+
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+
 import numpy as np
-from scipy import integrate
 from pa_approx import PAA
 from lloyd_max import LloydMaxQuantizer
 from sklearn.neighbors import KernelDensity
-from typing import Callable, List
+from typing import Callable
 
 
 class KernelSAX:
     def __init__(
-        self,
-        x: np.ndarray,
-        alphabets: np.ndarray,
-        kernel: str = "gaussian",
-        bandwidth: float = 0.2,
-        epochs: int = 100,
-        verbose: bool = False,
-        random_state: int = 42,
+            self,
+            x: np.ndarray,
+            alphabets: np.ndarray,
+            kernel: str = "gaussian",
+            bandwidth: float = 0.2,
+            epochs: int = 100,
+            verbose: bool = False,
+            random_state: int = 42,
     ) -> None:
         assert x.ndim == 1, "Only univariate time series data is supported."
         assert alphabets.ndim > 0, "Number of alphabets must be greater than zero."
@@ -68,7 +72,7 @@ class KernelSAX:
             )
         assert values.ndim == 1, "Only univariate time series data is supported."
         assert (
-            len(self.boundaries) > 0
+                len(self.boundaries) > 0
         ), "No cut points (boundaries) available. Call find_cut_points() first."
 
         codes = np.digitize(values.reshape(-1, 1), self.boundaries[1:], right=True)
