@@ -1,8 +1,0 @@
-kernel_config:
-    kernel: 'epanechnikov'
-    bandwidth: 0.5
-    degree: 2
-
-training:
-    epochs: 100
-    batch_size: 32

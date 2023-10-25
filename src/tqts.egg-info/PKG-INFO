@@ -1,3 +1,28 @@
+Metadata-Version: 2.1
+Name: tqts
+Version: 1.0
+Summary: A Python package for time series quantization and forecasting.
+Home-page: https://github.com/Dhanunjaya-Elluri/master-thesis
+Author: Dhanunjaya Elluri
+Author-email: dhanunjayet@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy~=1.24.3
+Requires-Dist: pandas~=1.5.3
+Requires-Dist: matplotlib~=3.7.1
+Requires-Dist: scikit-learn~=1.2.2
+Requires-Dist: scipy~=1.11.2
+Requires-Dist: numba~=0.57.0
+Requires-Dist: tiktoken~=0.3.3
+Requires-Dist: tqdm~=4.65.0
+Requires-Dist: torch~=2.0.0
+Requires-Dist: pytest~=7.4.2
+Requires-Dist: pyyaml~=6.0.1
+Requires-Dist: setuptools~=66.0.0
+
 ![tests](https://github.com/Dhanunjaya-Elluri/master-thesis/actions/workflows/tests.yaml/badge.svg)
 
 # Master's Thesis
@@ -42,8 +67,8 @@ To reproduce the experiments and analyses conducted in this thesis, follow these
 Clone this repository:
 `git clone https://github.com/Dhanunjaya-Elluri/master-thesis.git`
 
-Install the required dependencies: Run
-`pip install -e .`
+Install the required dependencies:
+`pip install -r requirements.txt`
 
 Navigate to the `notebooks/` directory and follow the notebooks in numerical order to reproduce the experiments step by step.
 
