@@ -1,0 +1,49 @@
+name: Python Tests and Coverage
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip --user --verbose
+        python -m pip install -r requirements.txt --user --verbose
+#        python -m pip install -e . --user --verbose
+        
+    - name: Code style compliance with black
+      run: |
+          pip install black
+          python -m black --check .
+
+    - name: Linting with flake8
+      run: |
+          pip install flake8
+          python -m flake8 .
+
+#    - name: Syntax check for JSON / YAML
+#      run: |
+#          from tqts.utils.file_syntax_ckeck.py import check_file_syntax
+#          from pathlib import Path
+#          p = Path(r"$(System.DefaultWorkingDirectory)")
+#          check_file_syntax(p)
+
+    - name: Run pytest with coverage
+      run: |
+          pytest --cov=src/ --cov-report=xml tests/
+      env:
+          CI: true
