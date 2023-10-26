@@ -44,6 +44,6 @@ jobs:
 
     - name: Run pytest with coverage
       run: |
-          pytest --cov=src/ --cov-report=xml tests/
+          pytest --cov=src/ --cov-report=html tests/
       env:
           CI: true
