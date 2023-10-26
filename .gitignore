@@ -3,3 +3,5 @@ playground
 src/*.egg-info
 *.pyc
 *.pyo
+.idea/
+.pytest_cache/
