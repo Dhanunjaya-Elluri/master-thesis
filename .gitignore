@@ -1,2 +1,5 @@
 .DS_Store
 playground
+src/*.egg-info
+*.pyc
+*.pyo
