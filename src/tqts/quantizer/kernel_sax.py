@@ -25,13 +25,13 @@ root_path = Path(__file__).parent.parent.parent
 
 class KernelSAX:
     def __init__(
-            self,
-            kernel: str = "gaussian",
-            n_alphabet: int = 7,
-            bandwidth: float = 3,
-            boundary_estimator: str = "lloyd-max",
-            epochs: int = 100,
-            random_state: int = 42,
+        self,
+        kernel: str = "gaussian",
+        n_alphabet: int = 7,
+        bandwidth: float = 3,
+        boundary_estimator: str = "lloyd-max",
+        epochs: int = 100,
+        random_state: int = 42,
     ) -> None:
         self.verbose = None
         self._validate_parameters(kernel, boundary_estimator)
@@ -72,7 +72,7 @@ class KernelSAX:
         self.quantile_levels = None
 
     def _estimate_density(
-            self, paa_series: np.ndarray
+        self, paa_series: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Estimate pdf of timeseries using kernel density estimation.
 
@@ -93,7 +93,7 @@ class KernelSAX:
         return x_d.flatten(), density
 
     def _calculate_lloyd_max_boundaries(
-            self, x_d_flatten: np.ndarray, density: np.ndarray
+        self, x_d_flatten: np.ndarray, density: np.ndarray
     ) -> None:
         """Calculate the boundaries for the Lloyd-Max quantizer.
 
@@ -245,15 +245,28 @@ class KernelSAX:
         # Plotting PAA segments with their symbols
         for idx, (pos, alphabet) in enumerate(zip(mid_positions, self.alphabets)):
             color_index = self.alphabets.index(alphabet)
-            ax1.plot((pos, pos), (self.paa_series[idx], self.paa_series[idx]), color='black', linestyle='-',
-                     linewidth=2)
-            ax1.text(pos, self.paa_series[idx], self.alphabets[idx], fontsize=12, ha='center', va='center_baseline',
-                     bbox=dict(boxstyle="round,pad=0.1", alpha=0.5, color=f"C{color_index}"))
+            ax1.plot(
+                (pos, pos),
+                (self.paa_series[idx], self.paa_series[idx]),
+                color="black",
+                linestyle="-",
+                linewidth=2,
+            )
+            ax1.text(
+                pos,
+                self.paa_series[idx],
+                self.alphabets[idx],
+                fontsize=12,
+                ha="center",
+                va="center_baseline",
+                bbox=dict(boxstyle="round,pad=0.1", alpha=0.5, color=f"C{color_index}"),
+            )
 
         # Plotting the Lloyd-Max boundaries
-        for boundary, color in zip(self.boundaries[1:-1],
-                                   colors):  # excluding the first and last, as they are -inf and inf
-            ax1.axhline(y=boundary, color=color, linestyle='--')
+        for boundary, color in zip(
+            self.boundaries[1:-1], colors
+        ):  # excluding the first and last, as they are -inf and inf
+            ax1.axhline(y=boundary, color=color, linestyle="--")
 
         # Create a divider for the existing axes instance
         divider = make_axes_locatable(ax1)
@@ -262,19 +275,19 @@ class KernelSAX:
         ax2 = divider.append_axes("left", size="20%", pad=0.05)
 
         # Plotting the density estimation vertically
-        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color='gray', alpha=0.5)
-        ax2.set_xlabel('Density')
+        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color="gray", alpha=0.5)
+        ax2.set_xlabel("Density")
 
         # Invert the x-axis for the density plot to have it visually make sense with the plot on the right
         ax2.invert_xaxis()
 
         # Adding necessary plot details
-        ax1.set_title('Time Series with lloyd-max boundaries')
-        ax1.set_xlabel('Time')
-        ax1.set_ylabel('Value')
+        ax1.set_title("Time Series with lloyd-max boundaries")
+        ax1.set_xlabel("Time")
+        ax1.set_ylabel("Value")
 
         # Adding legends and labels
-        ax1.legend(loc='upper left')
+        ax1.legend(loc="upper left")
 
         # Show the plot
         plt.tight_layout()
@@ -294,16 +307,18 @@ class KernelSAX:
         """
         fig, ax1 = plt.subplots(figsize=(16, 6))
 
-        ax1.plot(self.x, color='blue', label='Original Time Series', alpha=0.5)
-        ax1.set_xlabel('Time')
-        ax1.set_ylabel('Value')
-        ax1.set_title('Time Series with Quantile Lines')
+        ax1.plot(self.x, color="blue", label="Original Time Series", alpha=0.5)
+        ax1.set_xlabel("Time")
+        ax1.set_ylabel("Value")
+        ax1.set_title("Time Series with Quantile Lines")
 
         colors = plt.cm.viridis(np.linspace(0, 1, len(self.quantiles)))
 
         for i, (quantile, color) in enumerate(zip(self.quantiles, colors)):
-            label = f"{self.quantile_levels[i]:.2f}th Percentile"  # Label for the legend
-            ax1.axhline(y=quantile, color=color, linestyle='--', label=label)
+            label = (
+                f"{self.quantile_levels[i]:.2f}th Percentile"  # Label for the legend
+            )
+            ax1.axhline(y=quantile, color=color, linestyle="--", label=label)
 
         # Adding PAA segments and symbols
         # Calculate the positions of the PAA segments to plot them correctly (middle of the segment)
@@ -313,23 +328,38 @@ class KernelSAX:
         # Plotting PAA segments with their symbols
         for idx, (pos, symbol) in enumerate(zip(mid_positions, self.alphabets)):
             color_index = self.alphabets.index(symbol)
-            ax1.plot((pos, pos), (self.paa_series[idx], self.paa_series[idx]), color='black', linestyle='-', linewidth=2)
-            ax1.text(pos, self.paa_series[idx], self.alphabets[idx], fontsize=12, ha='center', va='center_baseline',
-                     bbox=dict(boxstyle="round,pad=0.1", alpha=0.5, color=f'C{int(color_index)}'))
+            ax1.plot(
+                (pos, pos),
+                (self.paa_series[idx], self.paa_series[idx]),
+                color="black",
+                linestyle="-",
+                linewidth=2,
+            )
+            ax1.text(
+                pos,
+                self.paa_series[idx],
+                self.alphabets[idx],
+                fontsize=12,
+                ha="center",
+                va="center_baseline",
+                bbox=dict(
+                    boxstyle="round,pad=0.1", alpha=0.5, color=f"C{int(color_index)}"
+                ),
+            )
         # Creating the density plot again as per the previous steps
         divider = make_axes_locatable(ax1)
         ax2 = divider.append_axes("left", size=1.5, pad=0.5, sharey=ax1)
-        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color='grey', alpha=0.5)
+        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color="grey", alpha=0.5)
         ax2.yaxis.set_major_formatter(NullFormatter())  # Remove y-tick labels
-        ax2.set_xlabel('Density')
+        ax2.set_xlabel("Density")
         ax2.yaxis.tick_right()
         max_density = np.max(self.density)  # find the maximum density value
         ax2.set_xlim(max_density, 0)
-        ax2.tick_params(axis='y', which='both', left=False, right=False)
+        ax2.tick_params(axis="y", which="both", left=False, right=False)
         ax2.set_ylim(ax1.get_ylim())  # Ensure the density plot aligns correctly
 
         # Adding a legend to the plot that includes the quantile information
-        ax1.legend(loc='upper left', bbox_to_anchor=(1.05, 1), title="Quantiles")
+        ax1.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Quantiles")
         plt.tight_layout()
         # save the plot to root_path/images
         plt.savefig(path + "kernel_sax_with_quantiles.png", dpi=300)
