@@ -1,4 +1,11 @@
-![tests](https://github.com/Dhanunjaya-Elluri/master-thesis/actions/workflows/tests.yaml/badge.svg)
+![tests](https://github.com/Dhanunjaya-Elluri/master-thesis/actions/workflows/ci.yaml/badge.svg) 
+![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg) 
+![Python version](https://img.shields.io/badge/Python-3.10.11-blue) 
+![Wheel](https://img.shields.io/badge/wheel-yes-brightgreen) 
+![Repo Status](https://img.shields.io/badge/status-active-brightgreen)
+
+[//]: # (![Stars]&#40;https://img.shields.io/github/stars/Dhanunjaya-Elluri/master-thesis?style=social&#41;)
+
 
 # Master's Thesis
 
@@ -17,23 +24,8 @@ A crucial aspect pertains to the design of time-series-specific positional encod
 
 ## Goal of the Thesis
 
-The primary goal of this thesis is to investigate and enhance the effectiveness of time series forecasting through a comprehensive exploration of quantization and transformative modeling techniques. The research aims to achieve the following objectives:
+The primary goal of this thesis is to investigate and enhance the effectiveness of time series forecasting through a comprehensive exploration of quantization and transformative modeling techniques.
 
-### Quantization with Kernel SAX Method
-
-The thesis seeks to quantize univariate time series data using the Kernel SAX method, transforming continuous data into discrete symbols from a finite alphabet. The focus on Kernel SAX, with its ability to estimate data density for quantization, aims to capture nuanced patterns inherent in the time series data while simplifying the input domain for subsequent analysis.
-
-### Leveraging Transformers for Forecasting
-
-Building upon the groundwork laid out in "Are Transformers Effective for Time Series Forecasting," [5] the thesis aims to apply a curated selection of Transformer models to the quantized time series data. These Transformers, originally designed for natural language processing, will be adapted to the time series forecasting domain to explore their potential for capturing intricate temporal dependencies and predicting future values.
-
-### Distance Metric-driven Evaluation
-
-The research seeks to establish a rigorous evaluation framework by employing appropriate distance metrics to assess the forecasting performance of the quantized alphabets. By meticulously measuring the dissimilarity between predicted and actual values, the thesis aims to provide a comprehensive understanding of the forecasting accuracy achieved through the proposed approach.
-
-### Benchmarking and Generalization
-
-To ensure the robustness and generalization of the proposed methodologies, the thesis will benchmark its techniques across a diverse set of 50 univariate time series datasets [2]. This extensive benchmarking will allow for a thorough assessment of the proposed methods’ efficacy across various real-world scenarios and data characteristics.
 
 ## Getting Started
 
@@ -42,10 +34,45 @@ To reproduce the experiments and analyses conducted in this thesis, follow these
 Clone this repository:
 `git clone https://github.com/Dhanunjaya-Elluri/master-thesis.git`
 
-Install the required dependencies: Run
+Install the required dependencies in editable mode: 
+
+Run
 `pip install -e .`
 
-Navigate to the `notebooks/` directory and follow the notebooks in numerical order to reproduce the experiments step by step.
+## Usage
+```python
+import pandas as pd
+from tqts.quantizer.kernel_sax import KernelSAX
+
+# Load the data
+df = pd.read_csv("../data/AirPassengers.csv")
+
+kernel_sax = KernelSAX(kernel='epanechnikov', n_alphabet=12, bandwidth=10, epochs=70)
+kernel_sax.fit(df['#Passengers'].values, paa_window_size=3, verbose=True)
+kernel_sax.plot_with_boundaries(path="../images/")
+kernel_sax.save_alphabets("../data/alphabets_with_lloyd.txt")
+
+kernel_sax = KernelSAX(kernel='epanechnikov', n_alphabet=12, bandwidth=10, boundary_estimator='quantile')
+kernel_sax.fit(df['#Passengers'].values, paa_window_size=3, verbose=True)
+kernel_sax.plot_with_quantiles(path="../images/")
+kernel_sax.save_alphabets("../data/alphabets_with_quantiles.txt")
+```
+
+## Results
+This will save the alphabets and the corresponding boundaries/quantiles in the specified path. The alphabets are saved in the following format:
+1. Alphabets obtained from lloyd-max quantizer
+```
+A A A A A A B A B B C B C C E C D E F C D E G D F G H F G H I G H I J H H I K H I J L I J K L J
+```
+
+2. Alphabets obtained from quantile estimation
+```
+A A B A A B C A B C D B C D E D D E F D D F G E F G H F G H I G H I J H H I K H I J K I J K K J
+```
+
+The plots are saved as follows:
+![Kernel SAX with Lloyd's Algorithm](./images/kernel_sax_with_boundaries.png)
+![Kernel SAX with Quantile Estimation](./images/kernel_sax_with_quantiles.png)
 
 ## References
 

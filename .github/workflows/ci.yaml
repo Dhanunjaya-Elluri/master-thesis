@@ -1,4 +1,4 @@
-name: Python Tests and Coverage
+name: Tests
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip --user --verbose
         python -m pip install -r requirements.txt --user --verbose
-#        python -m pip install -e . --user --verbose
+        python -m pip install -e . --user --verbose
         
     - name: Code style compliance with black
       run: |
