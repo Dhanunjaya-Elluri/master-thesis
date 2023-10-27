@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
@@ -6,18 +9,14 @@ import pytest
 from tqts.quantizer.paa import PAA
 
 
-# Define a fixture for the time series data that will be used in multiple tests.
 @pytest.fixture
 def time_series_data():
-    return np.arange(10, dtype=float)  # A simple time series for testing purposes.
+    return np.arange(10, dtype=float)
 
 
-# Define a fixture for PAA segments that will be used in tests.
 @pytest.fixture
 def paa_segments():
-    return np.array(
-        [0.5, 2.5, 4.5]
-    )  # Predefined segments for testing inverse_transform.
+    return np.array([0.5, 2.5, 4.5])
 
 
 # Test that the PAA class initializes correctly with valid inputs.

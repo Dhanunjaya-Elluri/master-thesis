@@ -71,8 +71,8 @@ A A B A A B C A B C D B C D E D D E F D D F G E F G H F G H I G H I J H H I K H 
 ```
 
 The plots are saved as follows:
-![Kernel SAX with Lloyd's Algorithm](./images/kernel_sax_with_boundaries.png)
-![Kernel SAX with Quantile Estimation](./images/kernel_sax_with_quantiles.png)
+![Kernel SAX with Lloyd's Algorithm](./images/ksax_with_lloyd.png)
+![Kernel SAX with Quantile Estimation](./images/ksax_with_quantiles.png)
 
 ## References
 

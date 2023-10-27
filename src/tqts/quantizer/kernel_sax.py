@@ -33,7 +33,7 @@ class KernelSAX:
         epochs: int = 100,
         random_state: int = 42,
     ) -> None:
-        self.verbose = None
+        self.verbose: bool = True
         self._validate_parameters(kernel, boundary_estimator)
         self.n_alphabet = n_alphabet
         self.kernel = kernel
@@ -107,15 +107,15 @@ class KernelSAX:
         # Find the quantiles of the estimated density
         density_interp = interp1d(x_d_flatten, density)
         quantizer = LloydMaxQuantizer(
-            x=x_d_flatten,
             density_func=density_interp,
             n_codewords=self.n_alphabet,
-            epochs=self.epochs,
             verbose=self.verbose,
             random_state=self.random_state,
             init_codewords="random",
         )
-        self.boundaries, self.codewords = quantizer.fit()
+        self.boundaries, self.codewords = quantizer.fit(
+            x=x_d_flatten, epochs=self.epochs
+        )
         self.is_fitted = True
         self.alphabets = self.encode_with_lloyd_boundaries()
 
@@ -275,7 +275,9 @@ class KernelSAX:
         ax2 = divider.append_axes("left", size="20%", pad=0.05)
 
         # Plotting the density estimation vertically
-        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color="gray", alpha=0.5)
+        ax2.fill_betweenx(
+            self.x_d_flatten, 0, self.density, color="lightsteelblue", alpha=0.5
+        )
         ax2.set_xlabel("Density")
 
         # Invert the x-axis for the density plot to have it visually make sense with the plot on the right
@@ -293,7 +295,7 @@ class KernelSAX:
         plt.tight_layout()
 
         # Save the plot to root_path/images
-        plt.savefig(path + "kernel_sax_with_boundaries.png", dpi=300)
+        plt.savefig(path + "ksax_with_lloyd.png", dpi=300)
         print(f"Plot saved to {path}")
 
     def plot_with_quantiles(self, path: str) -> None:
@@ -348,8 +350,10 @@ class KernelSAX:
             )
         # Creating the density plot again as per the previous steps
         divider = make_axes_locatable(ax1)
-        ax2 = divider.append_axes("left", size=1.5, pad=0.5, sharey=ax1)
-        ax2.fill_betweenx(self.x_d_flatten, 0, self.density, color="grey", alpha=0.5)
+        ax2 = divider.append_axes("left", size="20%", pad=0.5, sharey=ax1)
+        ax2.fill_betweenx(
+            self.x_d_flatten, 0, self.density, color="lightsteelblue", alpha=0.5
+        )
         ax2.yaxis.set_major_formatter(NullFormatter())  # Remove y-tick labels
         ax2.set_xlabel("Density")
         ax2.yaxis.tick_right()
@@ -362,5 +366,5 @@ class KernelSAX:
         ax1.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Quantiles")
         plt.tight_layout()
         # save the plot to root_path/images
-        plt.savefig(path + "kernel_sax_with_quantiles.png", dpi=300)
+        plt.savefig(path + "ksax_with_quantiles.png", dpi=300)
         print(f"Plot saved to {path}")

@@ -1,7 +1,8 @@
 .DS_Store
 playground
 src/*.egg-info
-*.pyc
-*.pyo
+__pycache__/
+*.py[cod]
+*$py.class
 .idea/
 .pytest_cache/
