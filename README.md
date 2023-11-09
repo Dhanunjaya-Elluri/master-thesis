@@ -59,20 +59,38 @@ kernel_sax.save_alphabets("../data/alphabets_with_quantiles.txt")
 ```
 
 ## Results
-This will save the alphabets and the corresponding boundaries/quantiles in the specified path. The alphabets are saved in the following format:
-1. Alphabets obtained from lloyd-max quantizer
-```
-A A A A A A B A B B C B C C E C D E F C D E G D F G H F G H I G H I J H H I K H I J L I J K L J
-```
+This will save the alphabets and the corresponding boundaries/quantiles in the specified path. The plots and alphabets are saved in the following format:
 
-2. Alphabets obtained from quantile estimation
-```
-A A B A A B C A B C D B C D E D D E F D D F G E F G H F G H I G H I J H H I K H I J K I J K K J
-```
 
-The plots are saved as follows:
-![Kernel SAX with Lloyd's Algorithm](./images/kernel_sax_with_boundaries.png)
-![Kernel SAX with Quantile Estimation](./images/kernel_sax_with_quantiles.png)
+<table>
+  <tr>
+    <td align="center">
+      <h2>Lloyd-Max Boundaries</h2>
+      <img src="./images/kernel_sax_with_boundaries.png" alt="Alt text for image 1" width="900"/> <br>
+        Alphabets Generated: A A A A A A B A B B C B C C E C D E F C D E G D F G H F G H I G H I J H H I K H I J L I J K L J
+    </td>
+    <td align="center">
+      <h2>Lloyd-Max Boundaries without seasonality & trend</h2>
+      <img src="./images/kernel_sax_with_boundaries_no_trend.png" alt="Alt text for image 2" width="900"/> <br>
+        Alphabets Generated: B B D C F G E E D D F E E H F C A B E D G H K H I J J F F H K G C B D B E I K K H K K G
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center">
+      <h2>Quantile Boundaries</h2>
+      <img src="./images/kernel_sax_with_quantiles.png" alt="Alt text for image 1" width="900"/> <br>
+        Alphabets Generated: A A B A A B C A B C D B C D E D D E F D D F G E F G H F G H I G H I J H H I K H I J K I J K K J
+    </td>
+    <td align="center">
+      <h2>Quantile Boundaries without seasonality & trend</h2>
+      <img src="./images/kernel_sax_with_quantiles_no_trend.png" alt="Alt text for image 2" width="900"/> <br>
+        Alphabets Generated: A B C C F G E E D D G E E H F B A A E D H H K H I J J F F H K G C B C A F I K K H K K G
+    </td>
+  </tr>
+</table>
 
 ## References
 

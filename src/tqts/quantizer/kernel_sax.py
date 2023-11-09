@@ -224,11 +224,12 @@ class KernelSAX:
             f.write(formatted_alphabets)
         print(f"Alphabets saved to {path}")
 
-    def plot_with_boundaries(self, path: str) -> None:
+    def plot_with_boundaries(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
 
         Args:
             path (str): Path to save the plot.
+            filename (str): Name of the plot.
 
         Returns:
             None
@@ -293,14 +294,15 @@ class KernelSAX:
         plt.tight_layout()
 
         # Save the plot to root_path/images
-        plt.savefig(path + "kernel_sax_with_boundaries.png", dpi=300)
+        plt.savefig(path + filename, dpi=300)
         print(f"Plot saved to {path}")
 
-    def plot_with_quantiles(self, path: str) -> None:
+    def plot_with_quantiles(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
 
         Args:
             path (str): Path to save the plot.
+            filename (str): Name of the plot.
 
         Returns:
             None
@@ -362,5 +364,5 @@ class KernelSAX:
         ax1.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Quantiles")
         plt.tight_layout()
         # save the plot to root_path/images
-        plt.savefig(path + "kernel_sax_with_quantiles.png", dpi=300)
+        plt.savefig(path + filename, dpi=300)
         print(f"Plot saved to {path}")

@@ -99,7 +99,8 @@ class LloydMaxQuantizer:
 
             if self.verbose:
                 print(
-                    f"Epoch {epoch + 1}, Boundaries delta: {boundaries_delta:.10f}, Codewords delta: {codewords_delta:.10f}"
+                    f"Epoch {epoch + 1}: Boundaries delta: {boundaries_delta:.10f}, "
+                    f"Codewords delta: {codewords_delta:.10f}"
                 )
 
             # Check stopping criteria
