@@ -75,7 +75,9 @@ class MultiHeadAttention(nn.Module):
         self.w_o = nn.Linear(d_model, d_model, bias=False)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: torch.Tensor
+    ) -> torch.Tensor:
         """Forward pass of the Multi Head Attention module.
 
         Args:
@@ -94,7 +96,9 @@ class MultiHeadAttention(nn.Module):
         q = q.transpose(1, 2)
         k = k.transpose(1, 2)
         v = v.transpose(1, 2)
-        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.d_k).float())
+        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(
+            torch.tensor(self.d_k).float()
+        )
         scores = scores.masked_fill(mask == 0, -1e9)
         scores = F.softmax(scores, dim=-1)
         scores = self.dropout(scores)
@@ -102,4 +106,3 @@ class MultiHeadAttention(nn.Module):
         x = x.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
         x = self.w_o(x)
         return x
-

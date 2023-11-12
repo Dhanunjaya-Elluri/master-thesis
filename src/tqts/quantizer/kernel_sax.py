@@ -6,7 +6,6 @@
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
-from pathlib import Path
 from typing import Tuple
 import numpy as np
 from scipy.interpolate import interp1d
