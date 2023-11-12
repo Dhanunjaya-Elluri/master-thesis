@@ -6,7 +6,6 @@
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
-from pathlib import Path
 from typing import Tuple
 import numpy as np
 from scipy.interpolate import interp1d
@@ -19,8 +18,6 @@ from tqts.quantizer.lloyd_max import LloydMaxQuantizer
 from sklearn.neighbors import KernelDensity
 
 from tqts.utils.quantizer_utils import calculate_quantile_levels, find_symbol
-
-root_path = Path(__file__).parent.parent.parent
 
 
 class KernelSAX:
@@ -224,11 +221,12 @@ class KernelSAX:
             f.write(formatted_alphabets)
         print(f"Alphabets saved to {path}")
 
-    def plot_with_boundaries(self, path: str) -> None:
+    def plot_with_boundaries(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
 
         Args:
             path (str): Path to save the plot.
+            filename (str): Name of the plot.
 
         Returns:
             None
@@ -295,14 +293,15 @@ class KernelSAX:
         plt.tight_layout()
 
         # Save the plot to root_path/images
-        plt.savefig(path + "ksax_with_lloyd.png", dpi=300)
+        plt.savefig(path + filename, dpi=300)
         print(f"Plot saved to {path}")
 
-    def plot_with_quantiles(self, path: str) -> None:
+    def plot_with_quantiles(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
 
         Args:
             path (str): Path to save the plot.
+            filename (str): Name of the plot.
 
         Returns:
             None
@@ -366,5 +365,5 @@ class KernelSAX:
         ax1.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Quantiles")
         plt.tight_layout()
         # save the plot to root_path/images
-        plt.savefig(path + "ksax_with_quantiles.png", dpi=300)
+        plt.savefig(path + filename, dpi=300)
         print(f"Plot saved to {path}")
