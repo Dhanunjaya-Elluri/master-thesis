@@ -31,13 +31,12 @@ The primary goal of this thesis is to investigate and enhance the effectiveness 
 
 To reproduce the experiments and analyses conducted in this thesis, follow these steps:
 
-Clone this repository:
-`git clone https://github.com/Dhanunjaya-Elluri/master-thesis.git`
+1. Clone this repository: <br>
+    `git clone https://github.com/Dhanunjaya-Elluri/master-thesis.git`
 
-Install the required dependencies in editable mode: 
 
-Run
-`pip install -e .`
+2. Run to install the required dependencies: <br>
+    `pip install -e .`
 
 ## Usage
 ```python

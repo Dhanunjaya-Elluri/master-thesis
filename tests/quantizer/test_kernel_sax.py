@@ -3,6 +3,9 @@
 
 """Test module for KernelSAX."""
 
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+
 import pytest
 import numpy as np
 from tqts.quantizer.kernel_sax import KernelSAX
