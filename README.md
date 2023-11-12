@@ -49,12 +49,12 @@ df = pd.read_csv("../data/AirPassengers.csv")
 
 kernel_sax = KernelSAX(kernel='epanechnikov', n_alphabet=12, bandwidth=10, epochs=70)
 kernel_sax.fit(df['#Passengers'].values, paa_window_size=3, verbose=True)
-kernel_sax.plot_with_boundaries(path="../images/")
+kernel_sax.plot_with_boundaries(path="../images/", filename="kernel_sax_with_boundaries.png")
 kernel_sax.save_alphabets("../data/alphabets_with_lloyd.txt")
 
 kernel_sax = KernelSAX(kernel='epanechnikov', n_alphabet=12, bandwidth=10, boundary_estimator='quantile')
 kernel_sax.fit(df['#Passengers'].values, paa_window_size=3, verbose=True)
-kernel_sax.plot_with_quantiles(path="../images/")
+kernel_sax.plot_with_quantiles(path="../images/", filename="kernel_sax_with_quantiles.png")
 kernel_sax.save_alphabets("../data/alphabets_with_quantiles.txt")
 ```
 
@@ -66,12 +66,12 @@ This will save the alphabets and the corresponding boundaries/quantiles in the s
   <tr>
     <td align="center">
       <h2>Lloyd-Max Boundaries</h2>
-      <img src="./images/kernel_sax_with_boundaries.png" alt="Alt text for image 1" width="900"/> <br>
+      <img src="./images/kernel_sax_with_boundaries.png" alt="Lloyd-Max Boundaries" width="900"/> <br>
         Alphabets Generated: A A A A A A B A B B C B C C E C D E F C D E G D F G H F G H I G H I J H H I K H I J L I J K L J
     </td>
     <td align="center">
-      <h2>Lloyd-Max Boundaries without seasonality & trend</h2>
-      <img src="./images/kernel_sax_with_boundaries_no_trend.png" alt="Alt text for image 2" width="900"/> <br>
+      <h2>Lloyd-Max Boundaries with decomposition</h2>
+      <img src="./images/kernel_sax_with_boundaries_no_trend.png" alt="Lloyd-Max Boundaries with decomposition" width="900"/> <br>
         Alphabets Generated: B B D C F G E E D D F E E H F C A B E D G H K H I J J F F H K G C B D B E I K K H K K G
     </td>
   </tr>
@@ -81,12 +81,12 @@ This will save the alphabets and the corresponding boundaries/quantiles in the s
   <tr>
     <td align="center">
       <h2>Quantile Boundaries</h2>
-      <img src="./images/kernel_sax_with_quantiles.png" alt="Alt text for image 1" width="900"/> <br>
+      <img src="./images/kernel_sax_with_quantiles.png" alt="Quantile Boundaries" width="900"/> <br>
         Alphabets Generated: A A B A A B C A B C D B C D E D D E F D D F G E F G H F G H I G H I J H H I K H I J K I J K K J
     </td>
     <td align="center">
-      <h2>Quantile Boundaries without seasonality & trend</h2>
-      <img src="./images/kernel_sax_with_quantiles_no_trend.png" alt="Alt text for image 2" width="900"/> <br>
+      <h2>Quantile Boundaries with decomposition</h2>
+      <img src="./images/kernel_sax_with_quantiles_no_trend.png" alt="Quantile Boundaries with decomposition" width="900"/> <br>
         Alphabets Generated: A B C C F G E E D D G E E H F B A A E D H H K H I J J F F H K G C B C A F I K K H K K G
     </td>
   </tr>
