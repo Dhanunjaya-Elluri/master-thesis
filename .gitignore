@@ -4,4 +4,4 @@ src/*.egg-info
 *.pyc
 *.pyo
 .pytest_cache/
-.idea
+.idea/*
