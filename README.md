@@ -1,6 +1,6 @@
 ![tests](https://github.com/Dhanunjaya-Elluri/master-thesis/actions/workflows/ci.yaml/badge.svg) 
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg) 
-![Python version](https://img.shields.io/badge/Python-3.10.11-blue) 
+![Python version](https://img.shields.io/badge/Python-3.10-blue) 
 ![Wheel](https://img.shields.io/badge/wheel-yes-brightgreen) 
 ![Repo Status](https://img.shields.io/badge/status-active-brightgreen)
 
