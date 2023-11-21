@@ -9,12 +9,14 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 import torch
 import torch.nn as nn
 
-from tqts.model.layers.decoder import Decoder
-from tqts.model.layers.encoder import Encoder
+from tqts.model.layers.decoder import Decoder, DecoderBlock
+from tqts.model.layers.encoder import Encoder, EncoderBlock
 from tqts.model.layers.components import (
     InputEmbeddings,
     PositionalEncoding,
     LinearLayer,
+    MultiHeadAttention,
+    FeedForward,
 )
 
 
@@ -23,66 +25,77 @@ class Transformer(nn.Module):
 
     def __init__(
         self,
-        encoder: nn.Module = Encoder,
-        decoder: nn.Module = Decoder,
-        enc_emb: nn.Module = InputEmbeddings,
-        dec_emb: nn.Module = InputEmbeddings,
-        enc_pos: nn.Module = PositionalEncoding,
-        dec_pos: nn.Module = PositionalEncoding,
-        linear_layer: nn.Module = LinearLayer,
-    ):
+        vocab_size: int,
+        d_model: int,
+        num_heads: int,
+        num_encoder_layers: int,
+        num_decoder_layers: int,
+        dim_feedforward: int,
+        dropout: float = 0.1,
+        activation: str = "relu",
+    ) -> None:
         super(Transformer, self).__init__()
-        self.encoder = encoder
-        self.decoder = decoder
-        self.enc_emb = enc_emb
-        self.dec_emb = dec_emb
-        self.enc_pos = enc_pos
-        self.dec_pos = dec_pos
-        self.linear_layer = linear_layer
 
-    def encode(self, x: torch.Tensor, mask: torch.Tensor = None) -> torch.Tensor:
-        """Forward pass of the Encoder module.
+        # Embeddings and positional encoding
+        self.input_embeddings = InputEmbeddings(vocab_size, d_model)
+        self.positional_encoding = PositionalEncoding(d_model, dropout)
 
-        Args:
-            x (torch.Tensor): Input tensor of shape (seq_len, batch_size).
-            mask (torch.Tensor, optional): Mask tensor of shape (seq_len, seq_len). Defaults to None.
+        # Encoder
+        encoder_layers = nn.ModuleList(
+            [
+                EncoderBlock(
+                    dropout,
+                    d_model,
+                    activation,
+                    MultiHeadAttention(d_model, num_heads, dropout),
+                    FeedForward(d_model, dim_feedforward, dropout),
+                )
+                for _ in range(num_encoder_layers)
+            ]
+        )
+        self.encoder = Encoder(encoder_layers, d_model)
 
-        Returns:
-            torch.Tensor: Output tensor of shape (seq_len, batch_size, d_model).
-        """
-        x = self.enc_emb(x)
-        x = self.enc_pos(x)
-        return self.encoder(x, mask)
+        # Decoder
+        decoder_layers = nn.ModuleList(
+            [
+                DecoderBlock(
+                    dropout,
+                    d_model,
+                    activation,
+                    MultiHeadAttention(d_model, num_heads, dropout),
+                    MultiHeadAttention(d_model, num_heads, dropout),
+                    FeedForward(d_model, dim_feedforward, dropout),
+                )
+                for _ in range(num_decoder_layers)
+            ]
+        )
+        self.decoder = Decoder(decoder_layers, d_model)
 
-    def decode(
+        # Output
+        self.output = LinearLayer(d_model, vocab_size)
+
+    def forward(
         self,
-        x: torch.Tensor,
-        encoder_output: torch.Tensor,
-        enc_mask: torch.Tensor = None,
-        dec_mask: torch.Tensor = None,
+        src: torch.Tensor,
+        tgt: torch.Tensor,
+        src_mask: torch.Tensor = None,
+        tgt_mask: torch.Tensor = None,
     ) -> torch.Tensor:
-        """Forward pass of the Decoder module.
+        """Forward pass of the Transformer module.
 
         Args:
-            x (torch.Tensor): Input tensor of shape (seq_len, batch_size).
-            encoder_output (torch.Tensor): Encoder output tensor of shape (seq_len, batch_size, d_model).
-            enc_mask (torch.Tensor, optional): Encoder mask tensor of shape (seq_len, seq_len). Defaults to None.
-            dec_mask (torch.Tensor, optional): Decoder mask tensor of shape (seq_len, seq_len). Defaults to None.
+            src (torch.Tensor): Source input tensor of shape (seq_len, batch_size).
+            tgt (torch.Tensor): Target input tensor of shape (seq_len, batch_size).
+            src_mask (torch.Tensor, optional): Source mask tensor of shape (seq_len, seq_len). Defaults to None.
+            tgt_mask (torch.Tensor, optional): Target mask tensor of shape (seq_len, seq_len). Defaults to None.
 
         Returns:
-            torch.Tensor: Output tensor of shape (seq_len, batch_size, d_model).
+            torch.Tensor: Output tensor of shape (seq_len, batch_size, vocab_size).
         """
-        x = self.dec_emb(x)
-        x = self.dec_pos(x)
-        return self.decoder(x, encoder_output, enc_mask, dec_mask)
-
-    def linear(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the Linear layer module.
-
-        Args:
-            x (torch.Tensor): Input tensor of shape (seq_len, batch_size, d_model).
-
-        Returns:
-            torch.Tensor: Output tensor of shape (seq_len, batch_size, output_size).
-        """
-        return self.linear_layer(x)
+        src = self.input_embeddings(src)
+        src = self.positional_encoding(src)
+        encoded = self.encoder(src, src_mask)
+        tgt = self.input_embeddings(tgt)
+        tgt = self.positional_encoding(tgt)
+        output = self.decoder(tgt, encoded, src_mask, tgt_mask)
+        return self.output(output)
