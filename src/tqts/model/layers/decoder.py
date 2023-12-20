@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from tqts.model.layers.components import (
+from tqts.model.layers.extensions import (
     AddAndNorm,
     ResidualConnection,
     FeedForward,

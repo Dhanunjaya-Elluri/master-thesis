@@ -8,6 +8,7 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
 from typing import Tuple
 import numpy as np
+import pandas as pd
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -18,6 +19,7 @@ from tqts.quantizer.lloyd_max import LloydMaxQuantizer
 from sklearn.neighbors import KernelDensity
 
 from tqts.utils.quantizer_utils import calculate_quantile_levels, find_symbol
+from tqts.utils.data_utils import text_to_df, generate_timestamps
 
 
 class KernelSAX:
@@ -29,7 +31,13 @@ class KernelSAX:
         boundary_estimator: str = "lloyd-max",
         epochs: int = 100,
         random_state: int = 42,
+        paa_window_size: int = 4,
     ) -> None:
+        self.assigned_codewords = None
+        self.codeword_to_alphabet = None
+        self.x = None
+        self.x_d_flatten = None
+        self.density = None
         self.verbose: bool = True
         self._validate_parameters(kernel, boundary_estimator)
         self.n_alphabet = n_alphabet
@@ -39,11 +47,14 @@ class KernelSAX:
         self.epochs = epochs
         self.random_state = random_state
         self.is_fitted = False
+        self.paa_window_size = paa_window_size
         self.paa_series = None
         self._initialize_attributes()
         self.ascii_codes = [
-            chr(i) for i in range(65, 65 + self.n_alphabet)
-        ]  # ASCII codes for uppercase letters
+            chr(i)
+            for i in range(65, 65 + self.n_alphabet)
+            if (65 <= i <= 90) or (97 <= i <= 122)
+        ]  # ASCII codes for A-Z and a-z
 
     @staticmethod
     def _validate_parameters(kernel, boundary_estimator):
@@ -57,14 +68,9 @@ class KernelSAX:
         ], "Invalid kernel type. Supported kernels: 'gaussian', 'epanechnikov'."
 
     def _initialize_attributes(self):
-        self.x = None
-        self.x_d_flatten = None
-        self.density = None
-        self.assigned_codewords = None
         self.codewords = None
         self.boundaries = None
         self.alphabets = None
-        self.codeword_to_alphabet = None
         self.quantiles = None
         self.quantile_levels = None
 
@@ -134,12 +140,12 @@ class KernelSAX:
         ]
         self.is_fitted = True
 
-    def fit(self, x: np.ndarray, paa_window_size: int, verbose: bool = True) -> list:
-        assert paa_window_size > 0, "PAA window size must be greater than zero."
+    def fit(self, x: np.ndarray, verbose: bool = True) -> list:
+        assert self.paa_window_size > 0, "PAA window size must be greater than zero."
         self.verbose = verbose
         self.x = x
 
-        paa = PAA(window_size=paa_window_size)
+        paa = PAA(window_size=self.paa_window_size)
         paa.fit(self.x)
         self.paa_series = paa.transform(self.x)
 
@@ -175,6 +181,7 @@ class KernelSAX:
             if not assigned:
                 assignments.append(self.codewords[-1])
 
+        self.assigned_codewords = assignments
         unique_codewords = np.unique(assignments)
         self.codeword_to_alphabet = dict(zip(unique_codewords, self.ascii_codes))
         return [self.codeword_to_alphabet[codeword] for codeword in assignments]
@@ -193,6 +200,7 @@ class KernelSAX:
         }
         # Map the symbols back to their codewords
         codewords = [alphabet_to_codeword[alphabet] for alphabet in self.alphabets]
+        self.assigned_codewords = codewords
         # Initialize the list that will hold the value ranges
         original_values = []
 
@@ -216,10 +224,39 @@ class KernelSAX:
             None
         """
         assert self.is_fitted, "fit() method must be called before saving codewords."
-        formatted_alphabets = " ".join(self.alphabets)
+        formatted_alphabets = "".join(self.alphabets)
         with open(path, "w") as f:
             f.write(formatted_alphabets)
         print(f"Alphabets saved to {path}")
+
+    def text_to_df(self, start_datetime: str, csv_path: str) -> None:
+        """Convert the alphabets to a pandas DataFrame.
+
+        Args:
+            start_datetime (str): Start date and time of the dataset.
+            csv_path (str): Path to save the DataFrame.
+
+        Returns:
+            None
+        """
+        assert self.is_fitted, "fit() method must be called before saving codewords."
+        timestamps = generate_timestamps(
+            start_datetime, len(self.alphabets), self.paa_window_size
+        )
+        # Character to index mapping
+        char_to_idx = {
+            char: idx for idx, char in enumerate(sorted(set(self.alphabets)))
+        }
+        df = pd.DataFrame(
+            {
+                "timestamp": timestamps,
+                "alphabets": list(self.alphabets),
+                "codewords": self.paa_series,
+                "encoded_alphabets": [char_to_idx[char] for char in self.alphabets],
+            }
+        )
+        df.to_csv(csv_path, index=False)
+        print(f"Generated codewords saved to {csv_path}")
 
     def plot_with_boundaries(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.

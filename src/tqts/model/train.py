@@ -11,6 +11,7 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 import os
 import time
 import argparse
+import logging
 
 import torch
 import torch.nn as nn
@@ -18,8 +19,12 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
 
 from tqts.model.transformer import Transformer
-from tqts.utils.dataloader import CharDataset, collate_fn
+from tqts.utils.dataloader import CharDataset
 from tqts.utils.config import load_config
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def load_and_split_dataset(file_path: str, seq_len: int, batch_size: int) -> tuple:
@@ -36,13 +41,12 @@ def load_and_split_dataset(file_path: str, seq_len: int, batch_size: int) -> tup
     dataset = CharDataset(file_path, seq_len)
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
+    logger.info(f"Dataset size: {len(dataset)}")
+    logger.info(f"Train size: {train_size} | Val size: {val_size}")
+    logger.info(f"No. of unique characters: {len(dataset.chars)}")
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-    train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
-    )
+    train_loader = DataLoader(train_dataset, batch_size=batch_size)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size)
     return train_loader, val_loader
 
 
@@ -54,7 +58,6 @@ def init_model(
     num_decoder_layers: int,
     dim_feedforward: int,
     dropout: float,
-    seq_len: int,
     activation: str,
 ) -> nn.Module:
     """Initialize the Transformer model.
@@ -67,7 +70,6 @@ def init_model(
         num_decoder_layers (int): Number of decoder layers.
         dim_feedforward (int): Feed forward dimension.
         dropout (float): Dropout probability.
-        seq_len (int): Sequence length.
         activation (str): Activation function.
 
 
@@ -75,6 +77,7 @@ def init_model(
         nn.Module: Transformer model.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
     model = Transformer(
         vocab_size,
         d_model,
@@ -85,6 +88,7 @@ def init_model(
         dropout,
         activation,
     ).to(device)
+    logger.info(f"Model initialized.")
     return model
 
 
@@ -138,6 +142,7 @@ def train(
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     best_val_loss = float("inf")
+    logger.info(f"Training started.")
     for epoch in range(1, epochs + 1):
         model.train()
         total_loss = 0.0
@@ -158,9 +163,11 @@ def train(
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(model.state_dict(), save_path)
+            logger.info(f"Saved model at {save_path}")
         if epoch % log_interval == 0:
-            print(
-                f"Epoch: {epoch}, Train Loss: {total_loss / len(train_loader):.4f}, Val Loss: {val_loss:.4f}, Time: {elapsed_time:.2f}s"
+            logger.info(
+                f"Epoch: {epoch} | Train loss: {total_loss / len(train_loader):.4f} | Val loss: {val_loss:.4f} | "
+                f"Elapsed time: {elapsed_time:.2f}s"
             )
 
 
@@ -187,7 +194,6 @@ def main(config_path: str) -> None:
         config["model"]["num_decoder_layers"],
         config["model"]["dim_feedforward"],
         config["model"]["dropout"],
-        config["data"]["seq_len"],
         config["model"]["activation"],
     )
     train(
@@ -197,7 +203,7 @@ def main(config_path: str) -> None:
         config["training"]["epochs"],
         config["optimizer"]["lr"],
         config["training"]["log_interval"],
-        os.path.join(config["training"]["save_dir"], "model.pt"),
+        os.path.join(config["training"]["save_dir"], config["training"]["save_name"]),
     )
 
 

@@ -11,7 +11,7 @@ import torch.nn as nn
 
 from tqts.model.layers.decoder import Decoder, DecoderBlock
 from tqts.model.layers.encoder import Encoder, EncoderBlock
-from tqts.model.layers.components import (
+from tqts.model.layers.extensions import (
     InputEmbeddings,
     PositionalEncoding,
     LinearLayer,
