@@ -247,11 +247,22 @@ class KernelSAX:
         char_to_idx = {
             char: idx for idx, char in enumerate(sorted(set(self.alphabets)))
         }
+
+        # Get lower and upper boundary for codewords
+        lower_boundaries = []
+        upper_boundaries = []
+        for codeword in self.assigned_codewords:
+            index = np.where(self.codewords == codeword)[0][0]
+            lower_boundaries.append(round(self.boundaries[index], 2))
+            upper_boundaries.append(round(self.boundaries[index + 1], 2))
+
         df = pd.DataFrame(
             {
                 "timestamp": timestamps,
                 "alphabets": list(self.alphabets),
-                "codewords": self.paa_series,
+                "codewords": [round(paa, 2) for paa in self.paa_series],
+                "lower_boundaries": lower_boundaries,
+                "upper_boundaries": upper_boundaries,
                 "encoded_alphabets": [char_to_idx[char] for char in self.alphabets],
             }
         )

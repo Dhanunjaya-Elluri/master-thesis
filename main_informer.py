@@ -29,7 +29,7 @@ parser.add_argument(
 parser.add_argument(
     "--target",
     type=str,
-    default="encoded_alphabets",
+    default="codewords",
     help="target feature in S or MS task",
 )
 parser.add_argument(
@@ -156,7 +156,7 @@ if args.use_gpu and args.use_multi_gpu:
 data_parser = {
     "ETTh1": {
         "data": "ETTh1_lloyd.csv",
-        "T": "encoded_alphabets",
+        "T": "codewords",
         "M": [1, 1, 1],
         "S": [1, 1, 1],
         "MS": [7, 7, 1],
