@@ -43,7 +43,7 @@ class ETTHourDataset(Dataset):
         features: str = "S",
         data_path: str = "ETTh1_lloyd.csv",
         target: str = "encoded_alphabets",
-        scale: bool = True,
+        scale: bool = False,
         time_enc: int = 0,
         freq: str = "4h",
         train_only: bool = False,
@@ -167,7 +167,7 @@ class ETTMinDataset(Dataset):
         features: str = "S",
         data_path: str = "ETTm1_lloyd.csv",
         target: str = "encoded_alphabets",
-        scale: bool = True,
+        scale: bool = False,
         time_enc: int = 0,
         freq: str = "t",
         train_only: bool = False,
@@ -291,7 +291,7 @@ class ETTHPredDataset(Dataset):
         features: str = "S",
         data_path: str = "ETTh1_lloyd.csv",
         target: str = "encoded_alphabets",
-        scale: bool = True,
+        scale: bool = False,
         inverse: bool = False,
         time_enc: int = 0,
         freq: str = "4h",
@@ -377,9 +377,9 @@ class ETTHPredDataset(Dataset):
 
         seq_x = self.data_x[s_begin:s_end]
         if self.inverse:
-            seq_y = self.data_x[r_begin : r_begin + self.label_len]
+            seq_y = self.data_x[r_begin: r_begin + self.label_len]
         else:
-            seq_y = self.data_y[r_begin : r_begin + self.label_len]
+            seq_y = self.data_y[r_begin: r_begin + self.label_len]
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 

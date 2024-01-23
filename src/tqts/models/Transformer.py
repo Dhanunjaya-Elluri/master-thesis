@@ -6,7 +6,7 @@
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
-from typing import Tuple, Any
+from typing import Any
 
 import torch
 import torch.nn as nn
