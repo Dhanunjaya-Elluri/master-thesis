@@ -208,14 +208,14 @@ class Model(nn.Module):
         )
 
     def forward(
-            self,
-            x_enc: torch.Tensor,
-            x_mark_enc: torch.Tensor,
-            x_dec: torch.Tensor,
-            x_mark_dec: torch.Tensor,
-            enc_self_mask: torch.Tensor = None,
-            dec_self_mask: torch.Tensor = None,
-            dec_enc_mask: torch.Tensor = None,
+        self,
+        x_enc: torch.Tensor,
+        x_mark_enc: torch.Tensor,
+        x_dec: torch.Tensor,
+        x_mark_dec: torch.Tensor,
+        enc_self_mask: torch.Tensor = None,
+        dec_self_mask: torch.Tensor = None,
+        dec_enc_mask: torch.Tensor = None,
     ) -> tuple[Any, Any] | Any:
         """Forward pass of the FEDFormer models.
 
@@ -240,9 +240,9 @@ class Model(nn.Module):
         )  # cuda()
         seasonal_init, trend_init = self.de_comp(x_enc)
         # decoder input
-        trend_init = torch.cat([trend_init[:, -self.label_len:, :], mean], dim=1)
+        trend_init = torch.cat([trend_init[:, -self.label_len :, :], mean], dim=1)
         seasonal_init = F.pad(
-            seasonal_init[:, -self.label_len:, :], (0, 0, 0, self.pred_len)
+            seasonal_init[:, -self.label_len :, :], (0, 0, 0, self.pred_len)
         )
         # enc
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
@@ -260,6 +260,6 @@ class Model(nn.Module):
         dec_out = trend_part + seasonal_part
 
         if self.output_attention:
-            return dec_out[:, -self.pred_len:, :], attns
+            return dec_out[:, -self.pred_len :, :], attns
         else:
-            return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+            return dec_out[:, -self.pred_len :, :]  # [B, L, D]

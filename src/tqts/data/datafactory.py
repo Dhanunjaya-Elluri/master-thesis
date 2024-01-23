@@ -3,10 +3,10 @@ from torch.utils.data import DataLoader
 
 # Mapping of data identifiers to corresponding dataset classes
 data_dict = {
-    'ETTh1': ETTHourDataset,
-    'ETTh2': ETTHourDataset,
-    'ETTm1': ETTMinDataset,
-    'ETTm2': ETTMinDataset,
+    "ETTh1": ETTHourDataset,
+    "ETTh2": ETTHourDataset,
+    "ETTm1": ETTMinDataset,
+    "ETTm2": ETTMinDataset,
 }
 
 
@@ -25,16 +25,16 @@ def data_provider(args, flag: str):
     Tuple[Dataset, DataLoader]: A tuple containing the dataset instance and the corresponding DataLoader.
     """
     Data = data_dict[args.data]
-    time_enc = 0 if args.embed != 'timeF' else 1
+    time_enc = 0 if args.embed != "timeF" else 1
     train_only = args.train_only
 
     # Setting parameters based on the mode
-    if flag == 'test':
+    if flag == "test":
         shuffle_flag = False
         drop_last = False
         batch_size = args.batch_size
         freq = args.freq
-    elif flag == 'pred':
+    elif flag == "pred":
         shuffle_flag = False
         drop_last = False
         batch_size = 1
@@ -56,7 +56,7 @@ def data_provider(args, flag: str):
         target=args.target,
         time_enc=time_enc,
         freq=freq,
-        train_only=train_only
+        train_only=train_only,
     )
     print(flag, len(data_set))
 
@@ -66,5 +66,6 @@ def data_provider(args, flag: str):
         batch_size=batch_size,
         shuffle=shuffle_flag,
         num_workers=args.num_workers,
-        drop_last=drop_last)
+        drop_last=drop_last,
+    )
     return data_set, data_loader

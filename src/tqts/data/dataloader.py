@@ -205,13 +205,19 @@ class ETTMinDataset(Dataset):
             0,
             12 * 30 * (24 * 60 // 30) - self.seq_len,
             # 12 months * 30 days * number of 30-min blocks in a day - seq_len
-            12 * 30 * (24 * 60 // 30) + 4 * 30 * (24 * 60 // 30) - self.seq_len,  # Same as above, extended by 4 months
+            12 * 30 * (24 * 60 // 30)
+            + 4 * 30 * (24 * 60 // 30)
+            - self.seq_len,  # Same as above, extended by 4 months
         ]
 
         border2s = [
-            12 * 30 * (24 * 60 // 30),  # 12 months * 30 days * number of 30-min blocks in a day
-            12 * 30 * (24 * 60 // 30) + 4 * 30 * (24 * 60 // 30),  # Same as above, extended by 4 months
-            12 * 30 * (24 * 60 // 30) + 8 * 30 * (24 * 60 // 30),  # Same as above, extended by another 4 months
+            12
+            * 30
+            * (24 * 60 // 30),  # 12 months * 30 days * number of 30-min blocks in a day
+            12 * 30 * (24 * 60 // 30)
+            + 4 * 30 * (24 * 60 // 30),  # Same as above, extended by 4 months
+            12 * 30 * (24 * 60 // 30)
+            + 8 * 30 * (24 * 60 // 30),  # Same as above, extended by another 4 months
         ]
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
@@ -352,7 +358,9 @@ class ETTHPredDataset(Dataset):
 
         df_stamp = pd.DataFrame(columns=["timestamp"])
         df_stamp.timestamp = list(tmp_stamp.timestamp.values) + list(pred_dates[1:])
-        data_stamp = time_features(df_stamp, time_enc=self.time_enc, freq=self.freq)  # freq[:-1]
+        data_stamp = time_features(
+            df_stamp, time_enc=self.time_enc, freq=self.freq
+        )  # freq[:-1]
 
         self.data_x = data[border1:border2]
         if self.inverse:
