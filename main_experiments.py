@@ -117,7 +117,7 @@ parser.add_argument(
 parser.add_argument(
     "--target",
     type=str,
-    default="encoded_alphabets",
+    default="codewords",
     help="target feature in S or MS task",
 )
 parser.add_argument(
