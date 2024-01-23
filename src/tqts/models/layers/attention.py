@@ -11,10 +11,11 @@ import math
 from typing import Tuple
 
 import numpy as np
+from math import sqrt
 import torch
 import torch.nn as nn
 
-from tqts.models.layers.masking import TriangularCasualMask, ProbMask
+from tqts.models.layers.masking import TriangularCausalMask, ProbMask, LogSparseMask
 
 
 class FullAttention(nn.Module):
@@ -23,10 +24,14 @@ class FullAttention(nn.Module):
     def __init__(
         self,
         mask_flag: bool = True,
-        factor: int = 5,
         scale=None,
         attention_dropout: float = 0.1,
         output_attention: bool = False,
+        sparse_flag: bool = False,
+        win_len: int = 0,
+        res_len: int = None,
+        fft_flag: bool = False,
+        **_
     ):
         """Initialize the Full Attention module.
 
@@ -36,12 +41,20 @@ class FullAttention(nn.Module):
             scale ([type], optional): Scale. Defaults to None.
             attention_dropout (float, optional): Dropout probability. Defaults to 0.1.
             output_attention (bool, optional): Output attention flag. Defaults to False.
+            sparse_flag (bool, optional): Sparse flag. Defaults to False.
+            win_len (int, optional): Window length. Defaults to 0.
+            res_len (int, optional): Residual length. Defaults to None.
+            fft_flag (bool, optional): FFT flag. Defaults to False.
         """
         super(FullAttention, self).__init__()
+        self.sparse_flag = sparse_flag
+        self.win_len = win_len
+        self.res_len = res_len
         self.scale = scale
         self.mask_flag = mask_flag
         self.output_attention = output_attention
-        self.dropout = nn.Dropout(p=attention_dropout)
+        self.dropout = nn.Dropout(attention_dropout)
+        self.fft_flag = fft_flag
 
     def forward(
         self,
@@ -62,20 +75,38 @@ class FullAttention(nn.Module):
             tuple: Output tensor of shape (batch_size, H, seq_len, d_model) and attention tensor of shape (batch_size, H, seq_len, seq_len).
         """
         B, L, H, E = query.shape
-        _, S, _, D = value.shape
-        scale = self.scale or 1.0 / math.sqrt(E)
+        _, S, _, D = value.shape[:4]
+
+        scale = self.scale or 1.0 / sqrt(E)
+
         scores = torch.einsum("blhe,bshe->bhls", query, key)
+
         if self.mask_flag:
             if attn_mask is None:
-                attn_mask = TriangularCasualMask(B, L, device=query.device).mask
-            scores.masked_fill_(attn_mask, -np.inf)
-        attn = torch.softmax(scores * scale, dim=-1)
-        attn = self.dropout(attn)
-        context = torch.einsum("bhls,bshd->blhd", attn, value)
-        if self.output_attention:
-            return context.contiguous(), attn
+                attn_mask = TriangularCausalMask(B, L, device=query.device)
+
+        if self.sparse_flag:
+            sparse_mask = LogSparseMask(
+                B, L, S, self.win_len, self.res_len, device=query.device
+            )
+            if self.mask_flag:
+                attn_mask._mask = attn_mask._mask.logical_or(sparse_mask._mask)
+            else:
+                attn_mask = sparse_mask
+
+        if self.sparse_flag or self.mask_flag:
+            scores.masked_fill_(attn_mask.mask, -np.inf)
+
+        A = self.dropout(torch.softmax(scale * scores, dim=-1))
+        if self.fft_flag:
+            V = torch.einsum("bhls,bshdc->blhdc", A, value)
         else:
-            return context.contiguous(), None
+            V = torch.einsum("bhls,bshd->blhd", A, value)
+
+        if self.output_attention:
+            return V.contiguous(), A
+        else:
+            return V.contiguous(), None
 
 
 class ProbAttention(nn.Module):

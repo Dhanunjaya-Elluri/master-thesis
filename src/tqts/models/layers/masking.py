@@ -45,7 +45,7 @@ class LocalMask:
         return self._mask
 
 
-class TriangularCasualMask:
+class TriangularCausalMask:
     """Triangular Casual Mask module for the Informer Model."""
 
     def __init__(self, B: int, L: int, device: str = "cpu"):
@@ -106,4 +106,41 @@ class ProbMask:
         Returns:
             torch.Tensor: Mask tensor of shape (B, H, L, L).
         """
+        return self._mask
+
+
+class LogSparseMask:
+    def __init__(self, B, Q_L, K_L, win_len=0, res_len=None, device="cpu"):
+        mask_shape = [B, 1, Q_L, K_L]
+        with torch.no_grad():
+            if res_len is None:
+                L_ls = K_L - 1 - win_len
+                n_reps = 1
+            else:
+                n_reps = np.ceil(K_L / res_len)
+                L_ls = res_len
+
+            l_floor = int(np.log2(L_ls))
+            indxs = np.array([int(2 ** (l_floor - i)) for i in range(l_floor + 1)])
+            reps_array = np.expand_dims(np.arange(n_reps, dtype="int") * L_ls, 1)
+            indxs = (indxs + reps_array + win_len).flatten()
+            indxs = indxs[indxs < (K_L - 1)]
+            my_mask = np.ones(K_L, dtype="int")
+            my_mask[indxs] = 0
+            my_mask[: (win_len + 1)] = 0
+            my_mask = np.concatenate([np.flip(my_mask[1:]), my_mask])
+            my_mask = np.array(
+                [my_mask[(K_L - i) : (K_L * 2 - i)] for i in range(1, Q_L + 1)],
+                dtype="bool",
+            )
+            self._mask = (
+                torch.from_numpy(my_mask)
+                .to(device)
+                .unsqueeze(0)
+                .unsqueeze(1)
+                .expand(mask_shape)
+            )
+
+    @property
+    def mask(self):
         return self._mask

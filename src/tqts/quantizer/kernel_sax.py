@@ -250,7 +250,7 @@ class KernelSAX:
             }
         )
         base, extension = csv_path.rsplit(".", 1)
-        boundary_df.to_csv(f'{base}_boundaries.{extension}', index=False)
+        boundary_df.to_csv(f"{base}_boundaries.{extension}", index=False)
         print(f"Boundaries saved to {base}_boundaries.{extension}")
 
         timestamps = generate_timestamps(

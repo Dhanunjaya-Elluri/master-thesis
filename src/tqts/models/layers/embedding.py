@@ -245,6 +245,186 @@ class DataEmbedding(nn.Module):
         return self.dropout(x)
 
 
+class LogSparseTokenEmbedding(nn.Module):
+    def __init__(self, c_in, d_model, kernel_size=3, spatial=False):
+        super(LogSparseTokenEmbedding, self).__init__()
+        assert torch.__version__ >= "1.5.0"
+        padding = kernel_size - 1
+        self.spatial = spatial
+        self.d_model = d_model
+        self.tokenConv = nn.Conv1d(
+            in_channels=c_in,
+            out_channels=d_model,
+            kernel_size=kernel_size,
+            padding=padding,
+            padding_mode="zeros",
+            bias=False,
+        )
+        for m in self.modules():
+            if isinstance(m, nn.Conv1d):
+                nn.init.kaiming_normal_(
+                    m.weight, mode="fan_in", nonlinearity="leaky_relu"
+                )
+
+    def forward(self, x):
+        B, L, d = x.shape[:3]
+        if self.spatial:
+            x = x.permute(0, 3, 1, 2).reshape(-1, L, d)
+            x = self.tokenConv(x.permute(0, 2, 1)).transpose(1, 2)[:, :L, :]
+            x = x.reshape(B, -1, L, self.d_model).permute(0, 2, 3, 1)
+        else:
+            x = self.tokenConv(x.permute(0, 2, 1)).transpose(1, 2)[:, :L, :]
+        return x
+
+
+class LogSparseTemporalEmbedding(nn.Module):
+    def __init__(self, d_model, embed_type="fixed", freq="h"):
+        super(LogSparseTemporalEmbedding, self).__init__()
+
+        minute_size = 6
+        hour_size = 24
+        weekday_size = 7
+        day_size = 32
+        month_size = 13
+
+        Embed = FixedEmbedding if embed_type == "fixed" else nn.Embedding
+        if freq == "t" or freq == "10min":
+            self.minute_embed = Embed(minute_size, d_model)
+        self.hour_embed = Embed(hour_size, d_model)
+        self.weekday_embed = Embed(weekday_size, d_model)
+        self.day_embed = Embed(day_size, d_model)
+        self.month_embed = Embed(month_size, d_model)
+
+    def forward(self, x):
+        x = x.long()
+
+        minute_x = (
+            self.minute_embed(x[:, :, 4]) if hasattr(self, "minute_embed") else 0.0
+        )
+        hour_x = self.hour_embed(x[:, :, 3])
+        weekday_x = self.weekday_embed(x[:, :, 2])
+        day_x = self.day_embed(x[:, :, 1])
+        month_x = self.month_embed(x[:, :, 0])
+
+        return hour_x + weekday_x + day_x + month_x + minute_x
+
+
+class LogSparseTimeFeatureEmbedding(nn.Module):
+    def __init__(self, d_model, embed_type="timeF", freq="h"):
+        super(LogSparseTimeFeatureEmbedding, self).__init__()
+
+        freq_map = {
+            "h": 4,
+            "t": 5,
+            "s": 6,
+            "m": 1,
+            "a": 1,
+            "w": 2,
+            "d": 3,
+            "b": 3,
+            "10min": 5,
+        }
+        d_inp = freq_map[freq]
+        self.embed = nn.Linear(d_inp, d_model, bias=False)
+
+    def forward(self, x):
+        return self.embed(x)
+
+
+class LogSparseDataEmbedding(nn.Module):
+    """A data embedding module for time series data, integrating value, positional, and
+    temporal embeddings.
+
+    This module is designed to process time series data by embedding input features,
+    temporal information, and positional information, making it suitable for models
+    handling sequential data.
+
+    Args:
+        c_in (int): Number of input channels.
+        d_model (int): Dimensionality of the models.
+        embed_type (str): Type of temporal embedding. Options: 'fixed', 'timeF'. Defaults to 'fixed'.
+        freq (str): Frequency of the data. Defaults to 'h'.
+        dropout (float): Dropout rate. Defaults to 0.1.
+        kernel_size (int): Kernel size for the value embedding. Defaults to 3.
+        spatial (bool): Flag to enable spatial embedding. Defaults to False.
+        temp_embed (bool): Flag to enable temporal embedding. Defaults to True.
+        d_pos (Optional[int]): Dimensionality of the positional embedding. If not provided, defaults to d_model.
+        pos_embed (bool): Flag to enable positional embedding. Defaults to True.
+    """
+
+    def __init__(
+        self,
+        c_in,
+        d_model,
+        embed_type="fixed",
+        freq="h",
+        dropout=0.1,
+        kernel_size=3,
+        spatial=False,
+        temp_embed=True,
+        d_pos=None,
+        pos_embed=True,
+    ):
+        super(LogSparseDataEmbedding, self).__init__()
+
+        self.value_embedding = LogSparseTokenEmbedding(
+            c_in=c_in, d_model=d_model, kernel_size=kernel_size, spatial=spatial
+        )
+        self.d_model = d_model
+        if d_pos is None:
+            self.d_pos = d_model
+        else:
+            self.d_pos = d_pos
+        self.position_embedding = (
+            PositionalEncoding(d_model=self.d_pos) if pos_embed else None
+        )
+        if temp_embed:
+            self.temporal_embedding = (
+                LogSparseTemporalEmbedding(
+                    d_model=d_model, embed_type=embed_type, freq=freq
+                )
+                if embed_type != "timeF"
+                else LogSparseTimeFeatureEmbedding(
+                    d_model=d_model, embed_type=embed_type, freq=freq
+                )
+            )
+        else:
+            self.temporal_embedding = None
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x, x_mark, n_node=None):
+        val_embed = self.value_embedding(x)
+        temp_embed = (
+            self.temporal_embedding(x_mark)
+            if self.temporal_embedding is not None
+            else None
+        )
+        pos_embed = (
+            self.position_embedding(x) if self.position_embedding is not None else None
+        )
+        if self.d_pos != self.d_model and pos_embed is not None:
+            pos_embed = pos_embed.repeat_interleave(2, dim=-1)
+        if temp_embed is not None:
+            if not (
+                len(val_embed.shape) == len(temp_embed.shape)
+            ):  # == len(pos_embed.shape)
+                temp_embed = torch.unsqueeze(temp_embed, -1)
+                pos_embed = (
+                    torch.unsqueeze(pos_embed, -1) if pos_embed is not None else None
+                )
+        if n_node is not None and temp_embed is not None:
+            temp_embed = torch.repeat_interleave(temp_embed, n_node, 0)
+        if pos_embed is not None:
+            x = (
+                val_embed + temp_embed + pos_embed
+                if temp_embed is not None
+                else val_embed + pos_embed
+            )
+        else:
+            x = val_embed + temp_embed if temp_embed is not None else val_embed
+        return self.dropout(x)
+
+
 class DataEmbedding_wo_pos(nn.Module):
     """
     DataEmbedding_wo_pos is a module for time series data embedding without positional information.
@@ -406,112 +586,4 @@ class DataEmbedding_wo_temp(nn.Module):
             Tensor: The resulting embedded output.
         """
         x = self.value_embedding(x) + self.position_embedding(x)
-        return self.dropout(x)
-
-
-class LogTransDataEmbedding(nn.Module):
-    """A data embedding module for time series data, integrating value, positional, and
-    temporal embeddings.
-
-    This module is designed to process time series data by embedding input features,
-    temporal information, and positional information, making it suitable for models
-    handling sequential data.
-
-    Args:
-        c_in (int): Number of input channels.
-        d_model (int): Dimensionality of the models.
-        embed_type (str): Type of temporal embedding. Options: 'fixed', 'timeF'. Defaults to 'fixed'.
-        freq (str): Frequency of the data. Defaults to 'h'.
-        dropout (float): Dropout rate. Defaults to 0.1.
-        kernel_size (int): Kernel size for the value embedding. Defaults to 3.
-        spatial (bool): Flag to enable spatial embedding. Defaults to False.
-        temp_embed (bool): Flag to enable temporal embedding. Defaults to True.
-        d_pos (Optional[int]): Dimensionality of the positional embedding. If not provided, defaults to d_model.
-        pos_embed (bool): Flag to enable positional embedding. Defaults to True.
-    """
-
-    def __init__(
-        self,
-        c_in: int,
-        d_model: int,
-        embed_type: str = "fixed",
-        freq: str = "h",
-        dropout: float = 0.1,
-        kernel_size: int = 3,
-        spatial: bool = False,
-        temp_embed: bool = True,
-        d_pos: int = None,
-        pos_embed: bool = True,
-    ):
-        super(LogTransDataEmbedding, self).__init__()
-
-        self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
-        self.d_model = d_model
-        if d_pos is None:
-            self.d_pos = d_model
-        else:
-            self.d_pos = d_pos
-        self.position_embedding = (
-            PositionalEncoding(d_model=self.d_pos) if pos_embed else None
-        )
-        if temp_embed:
-            self.temporal_embedding = (
-                TemporalEmbedding(
-                    d_model=d_model, embed_type=embed_type, frequency=freq
-                )
-                if embed_type != "timeF"
-                else TimeFeatureEmbedding(
-                    d_model=d_model, embed_type=embed_type, frequency=freq
-                )
-            )
-        else:
-            self.temporal_embedding = None
-        self.dropout = nn.Dropout(p=dropout)
-
-    def forward(
-        self, x: torch.Tensor, x_mark: torch.Tensor, n_node: int = None
-    ) -> torch.Tensor:
-        """
-        Forward pass of the DataEmbedding layer.
-
-        Applies value, temporal, and positional embeddings to the input data and
-        combines them to form a comprehensive representation.
-
-        Args:
-            x (torch.Tensor): Input feature tensor.
-            x_mark (torch.Tensor): Temporal markers tensor.
-            n_node (Optional[int]): Number of nodes (used in spatial embedding).
-
-        Returns:
-            torch.Tensor: The combined embedded tensor.
-        """
-        val_embed = self.value_embedding(x)
-        temp_embed = (
-            self.temporal_embedding(x_mark)
-            if self.temporal_embedding is not None
-            else None
-        )
-        pos_embed = (
-            self.position_embedding(x) if self.position_embedding is not None else None
-        )
-        if self.d_pos != self.d_model and pos_embed is not None:
-            pos_embed = pos_embed.repeat_interleave(2, dim=-1)
-        if temp_embed is not None:
-            if not (
-                len(val_embed.shape) == len(temp_embed.shape)
-            ):  # == len(pos_embed.shape)
-                temp_embed = torch.unsqueeze(temp_embed, -1)
-                pos_embed = (
-                    torch.unsqueeze(pos_embed, -1) if pos_embed is not None else None
-                )
-        if n_node is not None and temp_embed is not None:
-            temp_embed = torch.repeat_interleave(temp_embed, n_node, 0)
-        if pos_embed is not None:
-            x = (
-                val_embed + temp_embed + pos_embed
-                if temp_embed is not None
-                else val_embed + pos_embed
-            )
-        else:
-            x = val_embed + temp_embed if temp_embed is not None else val_embed
         return self.dropout(x)

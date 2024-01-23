@@ -36,10 +36,42 @@ parser.add_argument(
 )
 
 # LogSparse
-parser.add_argument('--kernel_size', type=int, default=3, help='Kernel size for the 1DConv value embedding')
-parser.add_argument('--qk_ker', type=int, default=4, help='Kernel size for the 1DConv query/key embedding')
-parser.add_argument('--v_conv', type=int, default=0, help='Kernel size for the 1DConv value embedding')
-
+parser.add_argument(
+    "--win_len",
+    type=int,
+    default=6,
+    help="Local attention length for LogSparse Transformer",
+)
+parser.add_argument(
+    "--res_len",
+    type=int,
+    default=None,
+    help="Restart attention length for LogSparse Transformer",
+)
+parser.add_argument(
+    "--qk_ker",
+    type=int,
+    default=4,
+    help="Key/Query convolution kernel length for LogSparse Transformer",
+)
+parser.add_argument(
+    "--v_conv",
+    type=int,
+    default=0,
+    help="Weather to apply ConvAttn for values (in addition to K/Q for LogSparseAttn",
+)
+parser.add_argument(
+    "--sparse_flag",
+    type=int,
+    default=1,
+    help="Weather to apply logsparse mask for LogSparse Transformer",
+)
+parser.add_argument(
+    "--kernel_size",
+    type=int,
+    default=3,
+    help="Kernel size for the 1DConv value embedding",
+)
 
 # supplementary config for FedFormer model
 parser.add_argument(

@@ -16,7 +16,7 @@ from tqts.models.layers.attention import (
     LogSparseAttentionLayer,
 )
 from tqts.models.layers.decoder import Decoder, DecoderLayer
-from tqts.models.layers.embedding import LogTransDataEmbedding
+from tqts.models.layers.embedding import LogSparseDataEmbedding
 from tqts.models.layers.encoder import Encoder, EncoderLayer
 
 
@@ -36,7 +36,7 @@ class Model(nn.Module):
         self.total_length = configs.pred_len + configs.seq_len
 
         # Embedding
-        self.enc_embedding = LogTransDataEmbedding(
+        self.enc_embedding = LogSparseDataEmbedding(
             configs.enc_in,
             configs.d_model,
             configs.embed,
@@ -44,7 +44,7 @@ class Model(nn.Module):
             configs.dropout,
             kernel_size=configs.kernel_size,
         )
-        self.dec_embedding = LogTransDataEmbedding(
+        self.dec_embedding = LogSparseDataEmbedding(
             configs.dec_in,
             configs.d_model,
             configs.embed,
@@ -61,6 +61,9 @@ class Model(nn.Module):
                             False,
                             attention_dropout=configs.dropout,
                             output_attention=configs.output_attention,
+                            sparse_flag=configs.sparse_flag,
+                            win_len=configs.win_len,
+                            res_len=configs.res_len,
                         ),
                         configs.d_model,
                         configs.n_heads,
@@ -85,6 +88,9 @@ class Model(nn.Module):
                             True,
                             attention_dropout=configs.dropout,
                             output_attention=configs.output_attention,
+                            sparse_flag=configs.sparse_flag,
+                            win_len=configs.win_len,
+                            res_len=configs.res_len,
                         ),
                         configs.d_model,
                         configs.n_heads,
@@ -96,6 +102,9 @@ class Model(nn.Module):
                             False,
                             attention_dropout=configs.dropout,
                             output_attention=configs.output_attention,
+                            sparse_flag=configs.sparse_flag,
+                            win_len=configs.win_len,
+                            res_len=configs.res_len,
                         ),
                         configs.d_model,
                         configs.n_heads,
