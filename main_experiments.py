@@ -35,6 +35,12 @@ parser.add_argument(
     help="models name, options: [Autoformer, Informer, Transformer, Logtrans, Fedformer]",
 )
 
+# LogSparse
+parser.add_argument('--kernel_size', type=int, default=3, help='Kernel size for the 1DConv value embedding')
+parser.add_argument('--qk_ker', type=int, default=4, help='Kernel size for the 1DConv query/key embedding')
+parser.add_argument('--v_conv', type=int, default=0, help='Kernel size for the 1DConv value embedding')
+
+
 # supplementary config for FedFormer model
 parser.add_argument(
     "--version",
