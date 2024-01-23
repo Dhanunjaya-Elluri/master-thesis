@@ -240,6 +240,19 @@ class KernelSAX:
             None
         """
         assert self.is_fitted, "fit() method must be called before saving codewords."
+
+        # Create a DataFrame for the boundaries and alphabets
+        boundary_df = pd.DataFrame(
+            {
+                "lower_boundaries": self.boundaries[:-1],
+                "upper_boundaries": self.boundaries[1:],
+                "alphabets": self.ascii_codes[: len(self.boundaries) - 1],
+            }
+        )
+        base, extension = csv_path.rsplit(".", 1)
+        boundary_df.to_csv(f'{base}_boundaries.{extension}', index=False)
+        print(f"Boundaries saved to {base}_boundaries.{extension}")
+
         timestamps = generate_timestamps(
             start_datetime, len(self.alphabets), self.paa_window_size
         )
