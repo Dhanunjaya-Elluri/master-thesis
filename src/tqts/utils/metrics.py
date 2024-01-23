@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""Metrics for evaluating the performance of the model."""
+"""Metrics for evaluating the performance of the models."""
 
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"

@@ -140,7 +140,7 @@ def time_features_from_freq(freq: str) -> List[TimeFeatures]:
 
 
 def time_features(
-    dates: pd.DataFrame, freq: str = "4h", timeenc: int = 1
+    dates: pd.DataFrame, freq: str = "4h", time_enc: int = 1
 ) -> np.ndarray:
     """
     Returns a numpy array of time features for given dates and frequency.
@@ -148,18 +148,18 @@ def time_features(
     Args:
         dates (pd.DatetimeIndex): DatetimeIndex to extract features from.
         freq (str): Frequency of the dataset. Defaults to "4h".
-        timeenc (int): Time encoding to use. Defaults to 1.
+        time_enc (int): Time encoding to use. Defaults to 1.
 
     Returns:
         np.ndarray: Array of time features.
     """
-    if timeenc == 0:
+    if time_enc == 0:
         dates["month"] = dates.date.apply(lambda row: row.month, 1)
         dates["day"] = dates.date.apply(lambda row: row.day, 1)
         dates["weekday"] = dates.date.apply(lambda row: row.weekday(), 1)
         dates["hour"] = dates.date.apply(lambda row: row.hour, 1)
         dates["minute"] = dates.date.apply(lambda row: row.minute, 1)
-        dates["minute"] = dates.minute.map(lambda x: x // 15)
+        dates["minute"] = dates.minute.map(lambda x: x // 30)
         freq_map = {
             "y": [],
             "m": ["month"],
@@ -170,7 +170,7 @@ def time_features(
             "t": ["month", "day", "weekday", "hour", "minute"],
         }
         return dates[freq_map[freq.lower()]].values
-    if timeenc == 1:
+    if time_enc == 1:
         dates = pd.to_datetime(dates.timestamp.values)
         return np.vstack(
             [feat(dates) for feat in time_features_from_freq(freq)]

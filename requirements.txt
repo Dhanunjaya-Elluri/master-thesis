@@ -14,3 +14,4 @@ setuptools~=68.0.0
 black
 flake8
 requests~=2.31.0
+ptflops

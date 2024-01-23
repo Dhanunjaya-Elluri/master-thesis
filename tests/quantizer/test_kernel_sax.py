@@ -25,7 +25,7 @@ def ksax_instance():
 
 def test_fit_with_lloyd(sample_data, ksax_instance):
     """Test the fit method of KernelSAX with LloydMaxQuantizer."""
-    alphabets = ksax_instance.fit(sample_data, paa_window_size=2)
+    alphabets = ksax_instance.fit(sample_data)
     assert ksax_instance.is_fitted is True
     assert len(alphabets) == len(sample_data) // 2
     assert all(isinstance(alphabet, str) for alphabet in alphabets)

@@ -10,32 +10,32 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 import argparse
 import torch
 import torch.nn as nn
-from tqts.model.transformer import Transformer
+from tqts.models.Transformer import Transformer
 from tqts.utils.config import load_config
 from tqts.utils.dataloader import CharDataset
 
 
-# load saved model using .pt file
+# load saved models using .pt file
 def load_model(model_path: str, device: str, config: dict) -> nn.Module:
-    """Load the saved model.
+    """Load the saved models.
 
     Args:
         config (dict): Config dictionary.
-        model_path (str): Path to the saved model.
-        device (str): Device to load the model to.
+        model_path (str): Path to the saved models.
+        device (str): Device to load the models to.
 
     Returns:
-        nn.Module: Loaded model.
+        nn.Module: Loaded models.
     """
     model = Transformer(
-        vocab_size=config["model"]["vocab_size"],
-        d_model=config["model"]["d_model"],
-        num_heads=config["model"]["num_heads"],
-        num_encoder_layers=config["model"]["num_encoder_layers"],
-        num_decoder_layers=config["model"]["num_decoder_layers"],
-        dim_feedforward=config["model"]["dim_feedforward"],
-        dropout=config["model"]["dropout"],
-        activation=config["model"]["activation"],
+        vocab_size=config["models"]["vocab_size"],
+        d_model=config["models"]["d_model"],
+        num_heads=config["models"]["num_heads"],
+        num_encoder_layers=config["models"]["num_encoder_layers"],
+        num_decoder_layers=config["models"]["num_decoder_layers"],
+        dim_feedforward=config["models"]["dim_feedforward"],
+        dropout=config["models"]["dropout"],
+        activation=config["models"]["activation"],
     )
     model.load_state_dict(torch.load(model_path, map_location=device))
     return model
@@ -46,7 +46,7 @@ def predict_next_char(
 ) -> str:
     """Predict all characters given a sequence of characters."""
 
-    # model.eval()
+    # models.eval()
     input_seq = [char_to_int.get(ch, 0) for ch in text[-d_model:]]
     input_seq = torch.tensor(input_seq, dtype=torch.long).unsqueeze(0)
     target_seq = torch.ones_like(input_seq, dtype=torch.long)
@@ -74,10 +74,10 @@ def main():
         "--model_path",
         type=str,
         default="checkpoints/ETTh1_model.pt",
-        help="Path to the saved model.",
+        help="Path to the saved models.",
     )
     parser.add_argument(
-        "--device", type=str, default="cpu", help="Device to load the model to."
+        "--device", type=str, default="cpu", help="Device to load the models to."
     )
     parser.add_argument(
         "--text",

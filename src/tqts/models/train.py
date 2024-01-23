@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""Training module for the Transformer model.
+"""Training module for the Transformer models.
 
 Modelling for next character prediction."""
 
@@ -18,7 +18,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
 
-from tqts.model.transformer import Transformer
+from tqts.models.Transformer import Transformer
 from tqts.utils.dataloader import CharDataset
 from tqts.utils.config import load_config
 
@@ -60,21 +60,21 @@ def init_model(
     dropout: float,
     activation: str,
 ) -> nn.Module:
-    """Initialize the Transformer model.
+    """Initialize the Transformer models.
 
     Args:
         vocab_size (int): Size of the vocabulary.
         d_model (int): Embedding dimension.
         num_heads (int): Number of attention heads.
-        num_encoder_layers (int): Number of encoder layers.
-        num_decoder_layers (int): Number of decoder layers.
+        num_encoder_layers (int): Number of encoder layers_temp.
+        num_decoder_layers (int): Number of decoder layers_temp.
         dim_feedforward (int): Feed forward dimension.
         dropout (float): Dropout probability.
         activation (str): Activation function.
 
 
     Returns:
-        nn.Module: Transformer model.
+        nn.Module: Transformer models.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
@@ -93,10 +93,10 @@ def init_model(
 
 
 def evaluate(model: nn.Module, val_loader: DataLoader) -> float:
-    """Evaluate the model on the validation set.
+    """Evaluate the models on the validation set.
 
     Args:
-        model (nn.Module): Transformer model.
+        model (nn.Module): Transformer models.
         val_loader (DataLoader): Validation data loader.
 
     Returns:
@@ -127,16 +127,16 @@ def train(
     log_interval: int,
     save_path: str,
 ) -> None:
-    """Train the model.
+    """Train the models.
 
     Args:
-        model (nn.Module): Transformer model.
+        model (nn.Module): Transformer models.
         train_loader (DataLoader): Train data loader.
         val_loader (DataLoader): Validation data loader.
         epochs (int): Number of epochs.
         lr (float): Learning rate.
         log_interval (int): Log interval.
-        save_path (str): Path to save the model.
+        save_path (str): Path to save the models.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     criterion = nn.CrossEntropyLoss()
@@ -163,7 +163,7 @@ def train(
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(model.state_dict(), save_path)
-            logger.info(f"Saved model at {save_path}")
+            logger.info(f"Saved models at {save_path}")
         if epoch % log_interval == 0:
             logger.info(
                 f"Epoch: {epoch} | Train loss: {total_loss / len(train_loader):.4f} | Val loss: {val_loss:.4f} | "
@@ -187,14 +187,14 @@ def main(config_path: str) -> None:
         config["data"]["batch_size"],
     )
     model = init_model(
-        config["model"]["vocab_size"],
-        config["model"]["d_model"],
-        config["model"]["num_heads"],
-        config["model"]["num_encoder_layers"],
-        config["model"]["num_decoder_layers"],
-        config["model"]["dim_feedforward"],
-        config["model"]["dropout"],
-        config["model"]["activation"],
+        config["models"]["vocab_size"],
+        config["models"]["d_model"],
+        config["models"]["num_heads"],
+        config["models"]["num_encoder_layers"],
+        config["models"]["num_decoder_layers"],
+        config["models"]["dim_feedforward"],
+        config["models"]["dropout"],
+        config["models"]["activation"],
     )
     train(
         model,

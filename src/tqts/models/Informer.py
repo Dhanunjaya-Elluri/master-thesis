@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""Informer model."""
+"""Informer models."""
 
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
@@ -9,21 +9,14 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 import torch
 import torch.nn as nn
 
-# import torch.nn.functional as F
-
-from tqts.model.informers.layers.extensions import (
-    DataEmbedding,
-    ProbAttention,
-    FullAttention,
-    AttentionLayer,
-    ConvLayer,
-)
-
-from tqts.model.informers.layers.encoder import Encoder, EncoderLayer, EncoderBlock
-from tqts.model.informers.layers.decoder import Decoder, DecoderLayer
+from tqts.models.layers.attention import FullAttention, ProbAttention, AttentionLayer
+from tqts.models.layers.auxiliary import ConvLayer
+from tqts.models.layers.decoder import Decoder, DecoderLayer
+from tqts.models.layers.embedding import DataEmbedding
+from tqts.models.layers.encoder import Encoder, EncoderLayer, EncoderBlock
 
 
-class Informer(nn.Module):
+class Model(nn.Module):
     """Informer Model."""
 
     def __init__(
@@ -50,7 +43,7 @@ class Informer(nn.Module):
         mix: bool = False,
         device: str = "cpu",
     ) -> None:
-        super(Informer, self).__init__()
+        super(Model, self).__init__()
         self.pred_len = out_len
         self.attn = attn
         self.output_attention = output_attention
@@ -136,7 +129,7 @@ class Informer(nn.Module):
         dec_self_mask: torch.Tensor = None,
         dec_enc_mask: torch.Tensor = None,
     ) -> tuple:
-        """Forward pass of the Informer model.
+        """Forward pass of the Informer models.
 
         Args:
             x_enc (torch.Tensor): Input tensor of shape (batch_size, seq_len, enc_in).
@@ -280,7 +273,7 @@ class InformerStack(nn.Module):
         dec_self_mask: torch.Tensor = None,
         dec_enc_mask: torch.Tensor = None,
     ) -> tuple:
-        """Forward pass of the Informer model.
+        """Forward pass of the Informer models.
 
         Args:
             x_enc (torch.Tensor): Input tensor of shape (batch_size, seq_len, enc_in).
