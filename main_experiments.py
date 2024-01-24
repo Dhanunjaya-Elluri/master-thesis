@@ -254,8 +254,8 @@ if args.is_training:
         # setting record of experiments
         setting = "et{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
             args.embed_type,
-            args.model_id,
             args.model,
+            args.model_id,
             args.data,
             args.features,
             args.seq_len,
@@ -296,8 +296,8 @@ else:
     ii = 0
     setting = "et{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
         args.embed_type,
-        args.model_id,
         args.model,
+        args.model_id,
         args.data,
         args.features,
         args.seq_len,
