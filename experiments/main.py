@@ -405,8 +405,8 @@ class ExpMain(ExpBasic):
         # Computing the overall average character distance
         average_distance_vec = np.mean(result_df['Character Distance'])
 
-        # save average_distance_vec to a text file in folder_path
-        np.savetxt(folder_path + 'average_distance_vec.txt', [average_distance_vec], fmt='%d')
+        # save average_distance_vec to a text file in folder_path with float format
+        np.savetxt(folder_path + 'average_distance_vec.txt', [average_distance_vec], fmt='%f')
 
         # np.save(folder_path + 'x.npy', inputx)
         return
