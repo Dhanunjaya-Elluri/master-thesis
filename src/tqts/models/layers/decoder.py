@@ -72,7 +72,7 @@ class Decoder(nn.Module):
     """Decoder module for the Informer Model."""
 
     def __init__(
-        self, layers: list, norm_layer: nn.Module = None, projection=None, **_
+        self, layers: list, norm_layer: nn.Module = None, projection=None
     ) -> None:
         super(Decoder, self).__init__()
         self.layers = nn.ModuleList(layers)
@@ -85,7 +85,6 @@ class Decoder(nn.Module):
         cross: torch.Tensor,
         x_mask: torch.Tensor = None,
         cross_mask: torch.Tensor = None,
-        **kwargs
     ) -> tuple[Tensor | Any, list[Any]]:
         """Forward pass of the Decoder module.
 
@@ -98,11 +97,8 @@ class Decoder(nn.Module):
         Returns:
             tuple: Output tensor of shape (batch_size, seq_len, d_model) and attention tensor of shape (batch_size, seq_len, seq_len).
         """
-        attentions = []
         for layer in self.layers:
-            x, a_sa, a_ca = layer(x, cross, x_mask, cross_mask, **kwargs)
-            attentions.append(a_sa)
-            attentions.append(a_ca)
+            x = layer(x, cross, x_mask, cross_mask)
 
         if self.norm is not None:
             x = self.norm(x)
@@ -110,7 +106,7 @@ class Decoder(nn.Module):
         if self.projection is not None:
             x = self.projection(x)
 
-        return x, attentions
+        return x
 
 
 class AutoDecoderLayer(nn.Module):

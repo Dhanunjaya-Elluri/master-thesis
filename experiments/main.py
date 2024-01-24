@@ -19,6 +19,7 @@ import torch.optim as optim
 from experiments.basic import ExpBasic
 from tqts.data.datafactory import data_provider
 from tqts.models import AutoFormer, Informer, LogSparse, Transformer, FedFormer
+from tqts.utils.data_utils import vectorized_find_character
 from tqts.utils.metrics import metric
 from tqts.utils.tools import (
     EarlyStopping,
@@ -345,8 +346,8 @@ class ExpMain(ExpBasic):
                 if i % 20 == 0:
                     input = batch_x.detach().cpu().numpy()
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
-                    pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + ".pdf"))
+                    pd_ = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
+                    visual(gt, pd_, os.path.join(folder_path, str(i) + ".pdf"))
 
         if self.args.test_flop:
             test_params_flop((batch_x.shape[1], batch_x.shape[2]))
@@ -373,6 +374,40 @@ class ExpMain(ExpBasic):
         # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe,rse, corr]))
         np.save(folder_path + "pred.npy", preds)
         np.save(folder_path + 'true.npy', trues)
+        boundaries_df = pd.read_csv(self.args.boundaries_df)
+        true_values_flat = trues.flatten()
+        pred_values_flat = preds.flatten()
+
+        # Converting boundaries and alphabets to numpy arrays for vectorized operations
+        lower_boundaries = boundaries_df['lower_boundaries'].to_numpy()
+        upper_boundaries = boundaries_df['upper_boundaries'].to_numpy()
+        alphabets = boundaries_df['alphabets'].to_numpy()
+
+        # Applying the function to true and predicted values
+        true_characters_vec = vectorized_find_character(true_values_flat, lower_boundaries, upper_boundaries, alphabets)
+        pred_characters_vec = vectorized_find_character(pred_values_flat, lower_boundaries, upper_boundaries, alphabets)
+
+        # Create a new DataFrame with true values, predicted values, and their corresponding characters
+        result_df = pd.DataFrame({
+            'True Values': true_values_flat,
+            'Predicted Values': pred_values_flat,
+            'True Characters': true_characters_vec,
+            'Predicted Characters': pred_characters_vec
+        })
+        # Calculating character distances
+        mask = (result_df['True Characters'].notna()) & (result_df['Predicted Characters'].notna())
+        result_df['Character Distance'] = np.abs(
+            result_df.loc[mask, 'True Characters'].apply(ord) - result_df.loc[mask, 'Predicted Characters'].apply(ord))
+
+        # Save result_df to folder_path
+        result_df.to_csv(folder_path + 'result_df.csv', index=False)
+
+        # Computing the overall average character distance
+        average_distance_vec = np.mean(result_df['Character Distance'])
+
+        # save average_distance_vec to a text file in folder_path
+        np.savetxt(folder_path + 'average_distance_vec.txt', [average_distance_vec], fmt='%d')
+
         # np.save(folder_path + 'x.npy', inputx)
         return
 

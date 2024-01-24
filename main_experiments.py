@@ -109,6 +109,9 @@ parser.add_argument(
     "--data_path", type=str, default="ETTh1_lloyd.csv", help="data file"
 )
 parser.add_argument(
+    "--boundaries_df", type=str, default="ETTh1_lloyd_boundaries.csv", help="boundaries dataset type"
+)
+parser.add_argument(
     "--features",
     type=str,
     default="M",

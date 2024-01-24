@@ -8,6 +8,8 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
 from typing import List
 from datetime import datetime, timedelta
+
+import numpy as np
 import pandas as pd
 
 
@@ -56,3 +58,15 @@ def text_to_df(file_path: str, start_datetime: str, interval: int = 4) -> pd.Dat
         }
     )
     return df
+
+
+def vectorized_find_character(values, lower_boundaries, upper_boundaries, alphabets):
+    # Initialize an array to store the characters
+    characters = np.full(values.shape, None)
+
+    # Iterate over each boundary and assign characters
+    for i, (lower, upper) in enumerate(zip(lower_boundaries, upper_boundaries)):
+        mask = (values >= lower) & (values < upper)
+        characters[mask] = alphabets[i]
+
+    return characters

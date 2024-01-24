@@ -23,6 +23,7 @@ do
     --is_training 1 \
     --root_path ./data/ \
     --data_path  ETTh1_lloyd_stationary.csv\
+    --boundaries_df ETTh1_lloyd_stationary_boundaries.csv\
     --model_id ETTh1_lloyd_stationary_$pred_len \
     --model $model_name \
     --data ETTh1 \
@@ -52,6 +53,7 @@ do
     --is_training 1 \
     --root_path ./data/ \
     --data_path  ETTh1_lloyd_trend.csv\
+    --boundaries_df ETTh1_lloyd_trend_boundaries.csv\
     --model_id ETTh1_lloyd_trend_$pred_len \
     --model $model_name \
     --data ETTh1 \
@@ -81,6 +83,7 @@ do
     --is_training 1 \
     --root_path ./data/ \
     --data_path  ETTh1_lloyd_seasonal.csv\
+    --boundaries_df ETTh1_lloyd_seasonal_boundaries.csv\
     --model_id ETTh1_lloyd_seasonal_$pred_len \
     --model $model_name \
     --data ETTh1 \
@@ -110,6 +113,7 @@ do
     --is_training 1 \
     --root_path ./data/ \
     --data_path  ETTh1_lloyd.csv\
+    --boundaries_df ETTh1_lloyd_boundaries.csv\
     --model_id ETTh1_lloyd_$pred_len \
     --model $model_name \
     --data ETTh1 \
