@@ -373,40 +373,54 @@ class ExpMain(ExpBasic):
 
         # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe,rse, corr]))
         np.save(folder_path + "pred.npy", preds)
-        np.save(folder_path + 'true.npy', trues)
-        boundaries_df = pd.read_csv(os.path.join(self.args.root_path, self.args.boundaries_df))
+        np.save(folder_path + "true.npy", trues)
+        boundaries_df = pd.read_csv(
+            os.path.join(self.args.root_path, self.args.boundaries_df)
+        )
         true_values_flat = trues.flatten()
         pred_values_flat = preds.flatten()
 
         # Converting boundaries and alphabets to numpy arrays for vectorized operations
-        lower_boundaries = boundaries_df['lower_boundaries'].to_numpy()
-        upper_boundaries = boundaries_df['upper_boundaries'].to_numpy()
-        alphabets = boundaries_df['alphabets'].to_numpy()
+        lower_boundaries = boundaries_df["lower_boundaries"].to_numpy()
+        upper_boundaries = boundaries_df["upper_boundaries"].to_numpy()
+        alphabets = boundaries_df["alphabets"].to_numpy()
 
         # Applying the function to true and predicted values
-        true_characters_vec = vectorized_find_character(true_values_flat, lower_boundaries, upper_boundaries, alphabets)
-        pred_characters_vec = vectorized_find_character(pred_values_flat, lower_boundaries, upper_boundaries, alphabets)
+        true_characters_vec = vectorized_find_character(
+            true_values_flat, lower_boundaries, upper_boundaries, alphabets
+        )
+        pred_characters_vec = vectorized_find_character(
+            pred_values_flat, lower_boundaries, upper_boundaries, alphabets
+        )
 
         # Create a new DataFrame with true values, predicted values, and their corresponding characters
-        result_df = pd.DataFrame({
-            'True Values': true_values_flat,
-            'Predicted Values': pred_values_flat,
-            'True Characters': true_characters_vec,
-            'Predicted Characters': pred_characters_vec
-        })
+        result_df = pd.DataFrame(
+            {
+                "True Values": true_values_flat,
+                "Predicted Values": pred_values_flat,
+                "True Characters": true_characters_vec,
+                "Predicted Characters": pred_characters_vec,
+            }
+        )
         # Calculating character distances
-        mask = (result_df['True Characters'].notna()) & (result_df['Predicted Characters'].notna())
-        result_df['Character Distance'] = np.abs(
-            result_df.loc[mask, 'True Characters'].apply(ord) - result_df.loc[mask, 'Predicted Characters'].apply(ord))
+        mask = (result_df["True Characters"].notna()) & (
+            result_df["Predicted Characters"].notna()
+        )
+        result_df["Character Distance"] = np.abs(
+            result_df.loc[mask, "True Characters"].apply(ord)
+            - result_df.loc[mask, "Predicted Characters"].apply(ord)
+        )
 
         # Save result_df to folder_path
-        result_df.to_csv(folder_path + 'result_df.csv', index=False)
+        result_df.to_csv(folder_path + "result_df.csv", index=False)
 
         # Computing the overall average character distance
-        average_distance_vec = np.mean(result_df['Character Distance'])
+        average_distance_vec = np.mean(result_df["Character Distance"])
 
         # save average_distance_vec to a text file in folder_path with float format
-        np.savetxt(folder_path + 'average_distance_vec.txt', [average_distance_vec], fmt='%f')
+        np.savetxt(
+            folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
+        )
 
         # np.save(folder_path + 'x.npy', inputx)
         return

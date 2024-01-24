@@ -109,7 +109,10 @@ parser.add_argument(
     "--data_path", type=str, default="ETTh1_lloyd.csv", help="data file"
 )
 parser.add_argument(
-    "--boundaries_df", type=str, default="ETTh1_lloyd_boundaries.csv", help="boundaries dataset type"
+    "--boundaries_df",
+    type=str,
+    default="ETTh1_lloyd_boundaries.csv",
+    help="boundaries dataset type",
 )
 parser.add_argument(
     "--features",
@@ -249,7 +252,8 @@ Exp = ExpMain
 if args.is_training:
     for ii in range(args.itr):
         # setting record of experiments
-        setting = "{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
+        setting = "et{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
+            args.embed_type,
             args.model_id,
             args.model,
             args.data,
@@ -290,7 +294,8 @@ if args.is_training:
         torch.cuda.empty_cache()
 else:
     ii = 0
-    setting = "{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
+    setting = "et{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}".format(
+        args.embed_type,
         args.model_id,
         args.model,
         args.data,
