@@ -374,7 +374,7 @@ class ExpMain(ExpBasic):
         # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe,rse, corr]))
         np.save(folder_path + "pred.npy", preds)
         np.save(folder_path + 'true.npy', trues)
-        boundaries_df = pd.read_csv(self.args.boundaries_df)
+        boundaries_df = pd.read_csv(os.path.join(self.args.root_path, self.args.boundaries_df))
         true_values_flat = trues.flatten()
         pred_values_flat = preds.flatten()
 
