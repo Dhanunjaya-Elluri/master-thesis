@@ -15,9 +15,9 @@ from tqts.models.layers.attention import (
     FullAttention,
     LogSparseAttentionLayer,
 )
-from tqts.models.layers.decoder import Decoder, DecoderLayer
+from tqts.models.layers.decoder import LogSparseDecoderLayer, LogSparseDecoder
 from tqts.models.layers.embedding import LogSparseDataEmbedding
-from tqts.models.layers.encoder import Encoder, EncoderLayer
+from tqts.models.layers.encoder import LogSparseEncoderLayer, LogSparseEncoder
 
 
 class Model(nn.Module):
@@ -53,9 +53,9 @@ class Model(nn.Module):
             kernel_size=configs.kernel_size,
         )
         # Encoder
-        self.encoder = Encoder(
+        self.encoder = LogSparseEncoder(
             [
-                EncoderLayer(
+                LogSparseEncoderLayer(
                     LogSparseAttentionLayer(
                         FullAttention(
                             False,
@@ -80,9 +80,9 @@ class Model(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
         # Decoder
-        self.decoder = Decoder(
+        self.decoder = LogSparseDecoder(
             [
-                DecoderLayer(
+                LogSparseDecoderLayer(
                     LogSparseAttentionLayer(
                         FullAttention(
                             True,
