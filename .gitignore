@@ -5,11 +5,11 @@ src/*.egg-info
 *.pyo
 .pytest_cache/
 .idea/*
-
 __pycache__/
 *.py[cod]
 *$py.class
-results/*
-logs/*
-gpu_results/*
-checkpoints/*
+/gpu_results/
+/results/
+/config/*
+/checkpoints/
+/logs/
