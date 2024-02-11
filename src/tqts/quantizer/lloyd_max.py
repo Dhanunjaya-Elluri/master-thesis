@@ -4,11 +4,12 @@
 """Lloyd-Max quantizer implementation."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
+
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 from scipy import integrate
-from typing import Optional, Callable, Tuple
 
 # constant for initialization method
 INIT_RANDOM = "random"

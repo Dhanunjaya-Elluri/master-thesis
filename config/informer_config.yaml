@@ -1,0 +1,53 @@
+model_config:
+  model: informer
+  features: M
+  e_layers: 2
+  d_model: 256
+  n_heads: 8
+  d_layers: 1
+  d_ff: 1024
+  target: encoded_alphabets
+  freq: 4h
+  activation: gelu
+  attn: prob
+  embed: timeF
+  output_attention: false
+  do_predict: false
+  mix: true
+  loss: mse
+  lradj: type1
+  use_amp: false
+  inverse: false
+  distil: true
+
+data_config:
+  data: ETTh1
+  root_path: ./data/
+  data_path: ETTh1_lloyd.csv
+  checkpoints: ./checkpoints/
+  cols: []
+
+training_config:
+  seq_len: 48
+  label_len: 48
+  pred_len: 24
+  enc_in: 7
+  dec_in: 7
+  c_out: 7
+  s_layers: 0,1,2,3
+  factor: 3
+  padding: 0
+  dropout: 0.05
+  num_workers: 0
+  itr: 5
+  train_epochs: 6
+  batch_size: 32
+  patience: 3
+  learning_rate: 0.0001
+  des: Exp
+
+gpu_config:
+  use_gpu: true
+  gpu: 0
+  use_multi_gpu: false
+  devices: '0,1,2,3'

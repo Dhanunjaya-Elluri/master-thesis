@@ -3,11 +3,15 @@
 
 """ File syntax check for JSON and YAML files. """
 
-import os
-import yaml
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjayet@gmail.com"
+
 import json
+import os
 from pathlib import Path
 from typing import List, Tuple
+
+import yaml
 
 
 def check_file_syntax(file_path: str) -> Tuple[bool, List[str]]:

@@ -3,7 +3,11 @@
 
 """Utility file for loading yaml configuration files."""
 
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjayet@gmail.com"
+
 import os
+
 import yaml
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../config/")

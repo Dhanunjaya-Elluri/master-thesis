@@ -6,6 +6,7 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
 import numpy as np
 import pytest
+
 from tqts.quantizer.paa import PAA
 
 

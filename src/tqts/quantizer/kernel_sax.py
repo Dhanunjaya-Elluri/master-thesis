@@ -4,23 +4,37 @@
 """Kernel SAX (K-SAX) is a kernel-based symbolic aggregate approximation technique for time series data."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import Tuple
-import numpy as np
-from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.ticker import NullFormatter
 
-from tqts.quantizer.paa import PAA
-from tqts.quantizer.lloyd_max import LloydMaxQuantizer
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.ticker import NullFormatter
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.interpolate import interp1d
 from sklearn.neighbors import KernelDensity
 
+from tqts.quantizer.lloyd_max import LloydMaxQuantizer
+from tqts.quantizer.paa import PAA
+from tqts.utils.data_utils import generate_timestamps
 from tqts.utils.quantizer_utils import calculate_quantile_levels, find_symbol
 
 
 class KernelSAX:
+    """Kernel SAX (K-SAX) is a kernel-based symbolic aggregate approximation technique for time series data.
+
+    Args:
+        kernel (str, optional): Type of kernel to use for kernel density estimation. Defaults to "gaussian".
+        n_alphabet (int, optional): Number of alphabets to use. Defaults to 7.
+        bandwidth (float, optional): Bandwidth for the kernel density estimation. Defaults to 3.
+        boundary_estimator (str, optional): Method to use for estimating the boundaries. Defaults to "lloyd-max".
+        epochs (int, optional): Number of epochs for the Lloyd-Max quantizer. Defaults to 100.
+        random_state (int, optional): Random state for reproducibility. Defaults to 42.
+        paa_window_size (int, optional): Window size for Piecewise Aggregate Approximation (PAA). Defaults to 4.
+    """
+
     def __init__(
         self,
         kernel: str = "gaussian",
@@ -29,7 +43,13 @@ class KernelSAX:
         boundary_estimator: str = "lloyd-max",
         epochs: int = 100,
         random_state: int = 42,
+        paa_window_size: int = 4,
     ) -> None:
+        self.assigned_codewords = None
+        self.codeword_to_alphabet = None
+        self.x = None
+        self.x_d_flatten = None
+        self.density = None
         self.verbose: bool = True
         self._validate_parameters(kernel, boundary_estimator)
         self.n_alphabet = n_alphabet
@@ -39,11 +59,14 @@ class KernelSAX:
         self.epochs = epochs
         self.random_state = random_state
         self.is_fitted = False
+        self.paa_window_size = paa_window_size
         self.paa_series = None
         self._initialize_attributes()
         self.ascii_codes = [
-            chr(i) for i in range(65, 65 + self.n_alphabet)
-        ]  # ASCII codes for uppercase letters
+            chr(i)
+            for i in range(65, 65 + self.n_alphabet)
+            if (65 <= i <= 90) or (97 <= i <= 122)
+        ]  # ASCII codes for A-Z and a-z
 
     @staticmethod
     def _validate_parameters(kernel, boundary_estimator):
@@ -57,14 +80,9 @@ class KernelSAX:
         ], "Invalid kernel type. Supported kernels: 'gaussian', 'epanechnikov'."
 
     def _initialize_attributes(self):
-        self.x = None
-        self.x_d_flatten = None
-        self.density = None
-        self.assigned_codewords = None
         self.codewords = None
         self.boundaries = None
         self.alphabets = None
-        self.codeword_to_alphabet = None
         self.quantiles = None
         self.quantile_levels = None
 
@@ -134,12 +152,12 @@ class KernelSAX:
         ]
         self.is_fitted = True
 
-    def fit(self, x: np.ndarray, paa_window_size: int, verbose: bool = True) -> list:
-        assert paa_window_size > 0, "PAA window size must be greater than zero."
+    def fit(self, x: np.ndarray, verbose: bool = True) -> list:
+        assert self.paa_window_size > 0, "PAA window size must be greater than zero."
         self.verbose = verbose
         self.x = x
 
-        paa = PAA(window_size=paa_window_size)
+        paa = PAA(window_size=self.paa_window_size)
         paa.fit(self.x)
         self.paa_series = paa.transform(self.x)
 
@@ -175,6 +193,7 @@ class KernelSAX:
             if not assigned:
                 assignments.append(self.codewords[-1])
 
+        self.assigned_codewords = assignments
         unique_codewords = np.unique(assignments)
         self.codeword_to_alphabet = dict(zip(unique_codewords, self.ascii_codes))
         return [self.codeword_to_alphabet[codeword] for codeword in assignments]
@@ -193,6 +212,7 @@ class KernelSAX:
         }
         # Map the symbols back to their codewords
         codewords = [alphabet_to_codeword[alphabet] for alphabet in self.alphabets]
+        self.assigned_codewords = codewords
         # Initialize the list that will hold the value ranges
         original_values = []
 
@@ -216,10 +236,63 @@ class KernelSAX:
             None
         """
         assert self.is_fitted, "fit() method must be called before saving codewords."
-        formatted_alphabets = " ".join(self.alphabets)
+        formatted_alphabets = "".join(self.alphabets)
         with open(path, "w") as f:
             f.write(formatted_alphabets)
         print(f"Alphabets saved to {path}")
+
+    def text_to_df(self, start_datetime: str, csv_path: str) -> None:
+        """Convert the alphabets to a pandas DataFrame.
+
+        Args:
+            start_datetime (str): Start date and time of the dataset.
+            csv_path (str): Path to save the DataFrame.
+
+        Returns:
+            None
+        """
+        assert self.is_fitted, "fit() method must be called before saving codewords."
+
+        # Create a DataFrame for the boundaries and alphabets
+        boundary_df = pd.DataFrame(
+            {
+                "lower_boundaries": self.boundaries[:-1],
+                "upper_boundaries": self.boundaries[1:],
+                "alphabets": self.ascii_codes[: len(self.boundaries) - 1],
+            }
+        )
+        base, extension = csv_path.rsplit(".", 1)
+        boundary_df.to_csv(f"{base}_boundaries.{extension}", index=False)
+        print(f"Boundaries saved to {base}_boundaries.{extension}")
+
+        timestamps = generate_timestamps(
+            start_datetime, len(self.alphabets), self.paa_window_size
+        )
+        # Character to index mapping
+        char_to_idx = {
+            char: idx for idx, char in enumerate(sorted(set(self.alphabets)))
+        }
+
+        # Get lower and upper boundary for codewords
+        lower_boundaries = []
+        upper_boundaries = []
+        for codeword in self.assigned_codewords:
+            index = np.where(self.codewords == codeword)[0][0]
+            lower_boundaries.append(round(self.boundaries[index], 2))
+            upper_boundaries.append(round(self.boundaries[index + 1], 2))
+
+        df = pd.DataFrame(
+            {
+                "timestamp": timestamps,
+                "alphabets": list(self.alphabets),
+                "codewords": [round(paa, 2) for paa in self.paa_series],
+                "lower_boundaries": lower_boundaries,
+                "upper_boundaries": upper_boundaries,
+                "encoded_alphabets": [char_to_idx[char] for char in self.alphabets],
+            }
+        )
+        df.to_csv(csv_path, index=False)
+        print(f"Generated codewords saved to {csv_path}")
 
     def plot_with_boundaries(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.

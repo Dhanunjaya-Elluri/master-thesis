@@ -4,10 +4,10 @@
 """Piecewise Aggregate Approximation (PAA) module."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class PAA:

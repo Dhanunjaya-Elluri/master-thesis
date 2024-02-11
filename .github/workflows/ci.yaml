@@ -10,38 +10,55 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    #--------------------------
+    # Check out repo and python
+    #--------------------------
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        sparse_checkout: |
+            /src/*
+            /experiments/*
+            /Pyraformer/*
+            /tests/*
+            /requirements.txt
+            /.flake8
+        sparse-checkout-cone-mode: false
 
-    - name: Set up Python
+
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
         python-version: 3.10.11
 
+    #--------------------------
+    # Install dependencies
+    #--------------------------
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip --user --verbose
         python -m pip install -r requirements.txt --user --verbose
         python -m pip install -e . --user --verbose
-        
+
+    #--------------------------
+    # Code compliance
+    #--------------------------
     - name: Code style compliance with black
       run: |
-          pip install black
           python -m black --check .
+
+    - name: Code style compliance with isort
+      run: |
+          python -m isort --check .
 
     - name: Linting with flake8
       run: |
-          pip install flake8
           python -m flake8 .
 
-#    - name: Syntax check for JSON / YAML
-#      run: |
-#          from tqts.utils.file_syntax_ckeck.py import check_file_syntax
-#          from pathlib import Path
-#          p = Path(r"$(System.DefaultWorkingDirectory)")
-#          check_file_syntax(p)
-
+    #--------------------------
+    # Run tests
+    #--------------------------
     - name: Run pytest with coverage
       run: |
           pytest --cov=src/ --cov-report=html tests/

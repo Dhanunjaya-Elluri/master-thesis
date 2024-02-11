@@ -1,0 +1,31 @@
+# Config file for the transformer models
+
+# Model parameters
+model:
+    vocab_size: 18
+    d_model: 256
+    num_heads: 8
+    num_encoder_layers: 5
+    num_decoder_layers: 5
+    dim_feedforward: 1024
+    dropout: 0.1
+    activation: 'relu'
+
+# dataset parameters
+data:
+    file_path: 'data/ETTh1_train.txt'
+    batch_size: 16
+    seq_len: 64
+    split_ratio: 0.8
+
+# training parameters
+training:
+    epochs: 10
+    log_interval: 1
+    log_dir: 'logs'
+    save_dir: 'checkpoints'
+    save_name: 'ETTh1_model.pt'
+
+# optimizer parameters
+optimizer:
+    lr: 0.001
