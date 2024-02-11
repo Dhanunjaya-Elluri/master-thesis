@@ -1,5 +1,5 @@
 .DS_Store
-playground
+playground/
 src/*.egg-info
 *.pyc
 *.pyo
@@ -9,7 +9,7 @@ src/*.egg-info
 __pycache__/
 *.py[cod]
 *$py.class
-results
-logs
-gpu_results
-checkpoints
+results/*
+logs/*
+gpu_results/*
+checkpoints/*
