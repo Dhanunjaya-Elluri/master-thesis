@@ -4,7 +4,7 @@
 """Utility for Time Features module."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 
 from typing import List
@@ -124,7 +124,7 @@ def time_features_from_freq(freq: str) -> List[TimeFeatures]:
     for offset_type, features_classes in feature_by_offset.items():
         if isinstance(offset, offset_type):
             return [feat() for feat in features_classes]
-    supported_freq_msg = f"""
+    supported_freq_msg = """
         Supported frequencies are:
             S - second
             T - minute

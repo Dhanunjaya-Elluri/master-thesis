@@ -4,7 +4,7 @@
 """Fourier Correlation Layers for FEDFormer models."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import List, Tuple
 
@@ -202,7 +202,7 @@ class FourierCrossAttention(nn.Module):
         B, L, H, E = q.shape
         xq = q.permute(0, 2, 3, 1)  # size = [B, H, E, L]
         xk = k.permute(0, 2, 3, 1)
-        xv = v.permute(0, 2, 3, 1)
+        # xv = v.permute(0, 2, 3, 1)
 
         # Compute Fourier coefficients
         xq_ft_ = torch.zeros(

@@ -4,11 +4,12 @@
 """Module to download and prepare timeseries datasets."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 import os
 from dataclasses import dataclass
 from typing import Optional
+
 import requests
 
 

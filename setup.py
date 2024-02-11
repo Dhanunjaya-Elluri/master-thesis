@@ -4,8 +4,8 @@
 """tqts package setup file."""
 
 from pathlib import Path
-import setuptools
 
+import setuptools
 
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjayet@gmail.com"

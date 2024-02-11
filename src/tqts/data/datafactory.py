@@ -1,5 +1,14 @@
-from tqts.data.dataloader import ETTHourDataset, ETTMinDataset, ETTHPredDataset
+#!/usr/bin/env python
+# coding: utf-8
+
+"""Data factory for time series forecasting models."""
+
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjayet@gmail.com"
+
 from torch.utils.data import DataLoader
+
+from tqts.data.dataloader import ETTHourDataset, ETTHPredDataset, ETTMinDataset
 
 # Mapping of data identifiers to corresponding dataset classes
 data_dict = {

@@ -1,16 +1,31 @@
-from typing import Union
-from functools import lru_cache
+#!/usr/bin/env python
+# coding: utf-8
 
-import torch
+"""Hierarchical TVM for Pyraformer model."""
+
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjayet@gmail.com"
+
+
 import os.path
 import sys
+
+import torch
 
 sys.path.append("pyraformer/tvm/python")
 
 
 class GraphMM(torch.autograd.Function):
-    """Class to encapsulate tvm code for compiling a diagonal_mm function, in addition to calling
-    this function from PyTorch
+    """
+    Custom PyTorch autograd function for graph-based matrix multiplication using TVM (Tensor Virtual Machine).
+
+    This class encapsulates the TVM code for compiling and executing a specialized matrix multiplication function,
+    which is optimized for certain types of operations common in neural networks, such as in attention mechanisms.
+    It supports different data types and devices (CPU/GPU), and it allows for a high degree of customization
+    in terms of tensor shapes and operations.
+
+    Attributes:
+        function_dict (dict): A dictionary to cache compiled TVM functions for different configurations.
     """
 
     function_dict = (
@@ -21,13 +36,23 @@ class GraphMM(torch.autograd.Function):
     def _compile_function(
         dtype: str, device: str, b0: int = 4, b1: int = 8, b2: int = 8
     ):
-        """Compiles a tvm function that computes diagonal_mm
-        args:
-        dtype: str in ['float64', 'float32', 'float16']
-        device: str in ['cpu' or 'cuda']
-        b0, b1, b2: size of tensor tiles. Very important for good performance
         """
-        import tvm  # import the full tvm library here for compilation. Don't import at the top of the file in case we don't need to compile
+        Compiles a TVM function that performs a specialized form of matrix multiplication.
+
+        The function is compiled for specific data types and devices, with configurable tensor tile sizes,
+        which are critical for performance.
+
+        Args:
+            dtype (str): Data type of the tensors, e.g., 'float32'.
+            device (str): Target device, 'cpu' or 'cuda'.
+            b0, b1, b2 (int): Tile sizes for the tensor dimensions, important for performance tuning.
+
+        Returns:
+            The compiled TVM function.
+        """
+        import tvm  # import the full tvm library here for compilation.
+
+        # Don't import at the top of the file in case we don't need to compile
         from tvm.contrib import nvcc
 
         @tvm.register_func
@@ -76,18 +101,15 @@ class GraphMM(torch.autograd.Function):
                     tvm.te.if_then_else(
                         q_k_mask[i, k] >= 0,
                         X[l, q_k_mask[i, k], q, k_q_mask[i, k]]
-                        * Y[
-                            l, q_k_mask[i, k], q, j
-                        ],  # # t1 is diagonaled and should be transposed
+                        * Y[l, q_k_mask[i, k], q, j],
+                        # # t1 is diagonaled and should be transposed
                         padding,
                     ),
                 ),
                 tvm.te.if_then_else(
                     q_k_mask[i, j] >= 0,
-                    X[l, i, q, k]
-                    * Y[
-                        l, q_k_mask[i, j], q, k
-                    ],  # t1 is not diagonaled, but the output tensor is going to be
+                    X[l, i, q, k] * Y[l, q_k_mask[i, j], q, k],
+                    # t1 is not diagonaled, but the output tensor is going to be
                     padding,
                 ),
             ),
@@ -140,18 +162,46 @@ class GraphMM(torch.autograd.Function):
         return graph_mm
 
     @staticmethod
-    def _get_lib_filename(dtype: str, device: str):
+    def _get_lib_filename(dtype: str, device: str) -> str:
+        """
+        Constructs the filename for the compiled TVM library based on data type and device.
+
+        Args:
+            dtype (str): Data type of the tensors.
+            device (str): Target device.
+
+        Returns:
+            str: Filename for the compiled TVM library.
+        """
         base_filename = "lib/lib_hierarchical_mm"
         return "{}_{}_{}.so".format(base_filename, dtype, device)
 
     @staticmethod
     def _save_compiled_function(f, dtype: str, device: str):
+        """
+        Saves the compiled TVM function to a file.
+
+        Args:
+            f: The compiled TVM function.
+            dtype (str): Data type of the tensors.
+            device (str): Target device.
+        """
         if not os.path.exists("lib/"):
             os.makedirs("lib/")
         f.export_library(GraphMM._get_lib_filename(dtype, device))
 
     @staticmethod
     def _load_compiled_function(dtype: str, device: str):
+        """
+        Loads a compiled TVM function from a file.
+
+        Args:
+            dtype (str): Data type of the tensors.
+            device (str): Target device.
+
+        Returns:
+            The loaded TVM function, if available.
+        """
         # from tvm.module import load  # this can be the small runtime python library, and doesn't need to be the whole thing
         from tvm.runtime.module import load_module as load
 
@@ -173,7 +223,16 @@ class GraphMM(torch.autograd.Function):
 
     @staticmethod
     def _get_function(dtype: str, device: str):
-        """Loads the function from the disk or compile it"""
+        """
+        Retrieves a compiled TVM function, either from cache, disk, or by compiling it.
+
+        Args:
+            dtype (str): Data type of the tensors.
+            device (str): Target device.
+
+        Returns:
+            The TVM function for graph-based matrix multiplication.
+        """
         # A list of arguments that define the function
         args = (dtype, device)
         if args not in GraphMM.function_dict:
@@ -206,12 +265,22 @@ class GraphMM(torch.autograd.Function):
         transpose_t1: bool = False,
         padding: int = 0,
         autoregressive: bool = False,
-    ):
-        """Calls the compiled function after checking the input format. This function is called in three different modes.
-        t1 x t2 = r ==> t1 and t2 are not diagonaled, but r is. Useful for query x key = attention_scores
-        t1 x t2 = r ==> t1 is diagonaled, but t2 and r are not. Useful to compuate attantion_scores x value = context
-        t1 x t2 = r ==> t1 is diagonaled and it should be transposed, but t2 and r are not diagonaled. Useful in some of
-                            the calculations in the backward pass.
+    ) -> torch.Tensor:
+        """
+        Performs the graph-based matrix multiplication using the compiled TVM function.
+
+        Args:
+            t1 (torch.Tensor): First input tensor.
+            t2 (torch.Tensor): Second input tensor.
+            q_k_mask (torch.Tensor): Query-key mask tensor.
+            k_q_mask (torch.Tensor): Key-query mask tensor.
+            is_t1_diagonaled (bool): Indicates if t1 is diagonaled.
+            transpose_t1 (bool): Indicates if t1 should be transposed.
+            padding (int): Padding value for invalid locations.
+            autoregressive (bool): Indicates if the operation is autoregressive.
+
+        Returns:
+            torch.Tensor: The result of the graph-based matrix multiplication.
         """
         dtype = str(t1.dtype).split(".")[1]
         device = t1.device.type
@@ -260,18 +329,15 @@ class GraphMM(torch.autograd.Function):
         return r
 
     @staticmethod
-    def _prepare_tensors(t):
-        """Fix `stride()` information of input tensor. This addresses some inconsistency in stride information in PyTorch.
-        For a tensor t, if t.size(0) == 1, then the value of t.stride()[0] doesn't matter.
-        TVM expects this value to be the `product(t.size()[1:])` but PyTorch some times sets it to `t.stride()[1]`.
-        Here's an example to reporduce this issue:
-            import torch
-            print(torch.randn(1, 10).stride())
-            > (10, 1)
-            print(torch.randn(10, 1).t().contiguous().stride())
-            > (1, 1)  # expected it to be (10, 1) as above
-            print(torch.randn(10, 2).t().contiguous().stride())
-            > (10, 1) # but gets the expected stride if the first dimension is > 1
+    def _prepare_tensors(t: torch.Tensor) -> torch.Tensor:
+        """
+        Prepares and fixes the stride information of the input tensor for TVM compatibility.
+
+        Args:
+            t (torch.Tensor): The tensor to prepare.
+
+        Returns:
+            torch.Tensor: The prepared tensor with fixed stride information.
         """
         assert t.is_contiguous()
         t_stride = list(t.stride())
@@ -284,34 +350,33 @@ class GraphMM(torch.autograd.Function):
             t = t.as_strided(size=t_size, stride=t_stride)
         return t
 
-    min_seq_len = 16  # unexpected output if seq_len < 16
+    min_seq_len = 16  # Minimum sequence length to avoid splitting errors
 
     @staticmethod
     def forward(
         ctx,
         t1: torch.Tensor,
         t2: torch.Tensor,
-        q_k_mask,
-        k_q_mask,
+        q_k_mask: torch.Tensor,
+        k_q_mask: torch.Tensor,
         is_t1_diagonaled: bool = False,
         padding: int = 0,
     ) -> torch.Tensor:
-        """Compuates diagonal_mm of t1 and t2.
-        args:
-        t1: torch.Tensor = (batch_size, seq_len, num_attention_heads, hidden_size|number_of_diagonals).
-            t1 can be a regular tensor (e.g. `query_layer`) or a diagonaled one (e.g. `attention_scores`)
-        t2: torch.Tensor = (batch_size, seq_len, num_attention_heads, hidden_size). This is always a non-diagonaled
-            tensor, e.g. `key_layer` or `value_layer`
-        w: int = window size; number of attentions on each side of the word
-        d: torch.Tensor or int = dilation of attentions per attention head. If int, the same dilation value will be used for all
-            heads. If torch.Tensor, it should be 1D of lenth=number of attention heads
-        is_t1_diagonaled: is t1 a diagonaled or a regular tensor
-        padding: the padding value to use when accessing invalid locations. This is mainly useful when the padding
-            needs to be a very large negative value (to compute softmax of attentions). For other usecases,
-            please use zero padding.
-        autoregressive: if true, return only the lower triangle
-        returns: torch.Tensor = (batch_size, seq_len, num_attention_heads, hidden_size|number_of_diagonals)
-            if t1 is diagonaed, result is non-diagonaled, and vice versa
+        """
+        Forward pass for the graph-based matrix multiplication.
+
+        Computes the diagonal matrix multiplication of t1 and t2 using a compiled TVM function.
+
+        Args:
+            t1 (torch.Tensor): First input tensor.
+            t2 (torch.Tensor): Second input tensor.
+            q_k_mask (torch.Tensor): Query-key mask tensor.
+            k_q_mask (torch.Tensor): Key-query mask tensor.
+            is_t1_diagonaled (bool): Indicates if t1 is diagonaled.
+            padding (int): Padding value for invalid locations.
+
+        Returns:
+            torch.Tensor: The result of the matrix multiplication.
         """
         seq_len = t1.size(1)
         assert (
@@ -338,7 +403,18 @@ class GraphMM(torch.autograd.Function):
         return output
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple:
+        """
+        Backward pass for the graph-based matrix multiplication.
+
+        Computes the gradients for t1 and t2 based on the gradient of the output.
+
+        Args:
+            grad_output (torch.Tensor): Gradient of the output tensor.
+
+        Returns:
+            tuple: Gradients for t1, t2, and None for the remaining arguments.
+        """
         t1, t2, q_k_mask, k_q_mask = ctx.saved_tensors
         is_t1_diagonaled = ctx.is_t1_diagonaled
         if not grad_output.is_contiguous():

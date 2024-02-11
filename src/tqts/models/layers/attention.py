@@ -4,18 +4,18 @@
 """Attention family for TQTS Model."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 
 import math
+from math import sqrt
 from typing import Tuple
 
 import numpy as np
-from math import sqrt
 import torch
 import torch.nn as nn
 
-from tqts.models.layers.masking import TriangularCausalMask, ProbMask, LogSparseMask
+from tqts.models.layers.masking import LogSparseMask, ProbMask, TriangularCausalMask
 
 
 class FullAttention(nn.Module):
@@ -134,7 +134,9 @@ class ProbAttention(nn.Module):
         self.factor = factor
         self.scale = scale
 
-    def _prob_QK(self, Q: torch.Tensor, K: torch.Tensor, sample_k: int, n_top: int):
+    def _prob_QK(
+        self, Q: torch.Tensor, K: torch.Tensor, sample_k: int, n_top: int
+    ) -> tuple:
         """Calculate the QK probability.
 
         Args:
@@ -167,7 +169,7 @@ class ProbAttention(nn.Module):
         Q_K = torch.matmul(Q_reduce, K.transpose(-2, -1))
         return Q_K, M_top
 
-    def _get_initial_context(self, V: torch.Tensor, L_Q: int):
+    def _get_initial_context(self, V: torch.Tensor, L_Q: int) -> torch.Tensor:
         """Get the initial context.
 
         Args:
@@ -194,7 +196,7 @@ class ProbAttention(nn.Module):
         index: int,
         L_Q: int,
         attn_mask: torch.Tensor = None,
-    ):
+    ) -> torch.Tensor:
         """Update the context.
 
         Args:

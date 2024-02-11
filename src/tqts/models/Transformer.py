@@ -4,7 +4,7 @@
 """Transformer Main Module"""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import Any
 
@@ -16,8 +16,8 @@ from tqts.models.layers.decoder import Decoder, DecoderLayer
 from tqts.models.layers.embedding import (
     DataEmbedding,
     DataEmbedding_wo_pos,
-    DataEmbedding_wo_temp,
     DataEmbedding_wo_pos_temp,
+    DataEmbedding_wo_temp,
 )
 from tqts.models.layers.encoder import Encoder, EncoderLayer
 
@@ -143,7 +143,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.e_layers)
+                for _ in range(configs.e_layers)
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
@@ -176,7 +176,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.d_layers)
+                for _ in range(configs.d_layers)
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model),
             projection=nn.Linear(configs.d_model, configs.c_out, bias=True),

@@ -4,20 +4,17 @@
 """LogSparse Transformer Module"""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import Any
 
 import torch
 import torch.nn as nn
 
-from tqts.models.layers.attention import (
-    FullAttention,
-    LogSparseAttentionLayer,
-)
-from tqts.models.layers.decoder import LogSparseDecoderLayer, LogSparseDecoder
+from tqts.models.layers.attention import FullAttention, LogSparseAttentionLayer
+from tqts.models.layers.decoder import LogSparseDecoder, LogSparseDecoderLayer
 from tqts.models.layers.embedding import LogSparseDataEmbedding
-from tqts.models.layers.encoder import LogSparseEncoderLayer, LogSparseEncoder
+from tqts.models.layers.encoder import LogSparseEncoder, LogSparseEncoderLayer
 
 
 class Model(nn.Module):
@@ -75,7 +72,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.e_layers)
+                for _ in range(configs.e_layers)
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
@@ -116,7 +113,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.d_layers)
+                for _ in range(configs.d_layers)
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model),
             projection=nn.Linear(configs.d_model, configs.c_out, bias=True),

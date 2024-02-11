@@ -4,7 +4,7 @@
 """Metrics for evaluating the performance of the models."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 import numpy as np
 
@@ -19,7 +19,11 @@ def CORR(pred, true):
     u = ((true - true.mean(0)) * (pred - pred.mean(0))).sum(0)
     d = np.sqrt(((true - true.mean(0)) ** 2 * (pred - pred.mean(0)) ** 2).sum(0))
     d += 1e-12
-    return 0.01 * (u / d).mean(-1)
+    corr = u / d
+    if np.isscalar(corr):
+        return 0.01 * corr
+    else:
+        return 0.01 * (u / d).mean(-1)
 
 
 def MAE(pred, true):

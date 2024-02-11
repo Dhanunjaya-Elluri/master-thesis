@@ -4,10 +4,10 @@
 """Multi Wavelet Transform layers for TQTS."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 import math
-from typing import Tuple, Any, Optional, List
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -290,9 +290,11 @@ class SparseKernelFT1d(nn.Module):
         x_fft = torch.fft.rfft(x)
 
         # Multiply relevant Fourier modes
-        l = min(self.modes1, N // 2 + 1)
+        fourier_mode_limit = min(self.modes1, N // 2 + 1)
         out_ft = torch.zeros(B, c * k, N // 2 + 1, device=x.device, dtype=torch.cfloat)
-        out_ft[:, :, :l] = complex_mul1d(x_fft[:, :, :l], self.weights1[:, :, :l])
+        out_ft[:, :, :fourier_mode_limit] = complex_mul1d(
+            x_fft[:, :, :fourier_mode_limit], self.weights1[:, :, :fourier_mode_limit]
+        )
 
         # Inverse FFT and reshape
         x = torch.fft.irfft(out_ft, n=N)

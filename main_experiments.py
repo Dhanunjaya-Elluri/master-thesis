@@ -1,9 +1,18 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+"""Experiments Module."""
+
+__author__ = "Dhanunjaya Elluri"
+__mail__ = "dhanunjayet@gmail.com"
+
 import argparse
-import os
-import torch
-from experiments.main import ExpMain
 import random
+
 import numpy as np
+import torch
+
+from experiments.main import ExpMain
 
 fix_seed = 2021
 random.seed(fix_seed)

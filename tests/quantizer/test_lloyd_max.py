@@ -5,8 +5,9 @@ __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
 
-import pytest
 import numpy as np
+import pytest
+
 from tqts.quantizer.lloyd_max import LloydMaxQuantizer
 
 

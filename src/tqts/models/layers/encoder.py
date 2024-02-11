@@ -4,7 +4,7 @@
 """Encoder module for TQTS Model."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 import torch
 import torch.nn as nn

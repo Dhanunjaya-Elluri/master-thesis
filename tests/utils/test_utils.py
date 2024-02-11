@@ -6,10 +6,11 @@ __mail__ = "dhanunjaya.elluri@tu-dortmund.de"
 
 import numpy as np
 import pytest
+
 from tqts.utils.quantizer_utils import (
+    calculate_quantile_levels,
     character_distance,
     character_distance_between_strings,
-    calculate_quantile_levels,
     find_symbol,
 )
 

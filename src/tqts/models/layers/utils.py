@@ -4,12 +4,13 @@
 """Utility functions for the wavelet transformation layer"""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
+
+from functools import partial
 
 import numpy as np
-from functools import partial
-from sympy import Symbol, Poly, legendre, chebyshevt
 from scipy.special import eval_legendre
+from sympy import Poly, Symbol, chebyshevt, legendre
 
 
 def legendreDer(k: int, x: float) -> float:

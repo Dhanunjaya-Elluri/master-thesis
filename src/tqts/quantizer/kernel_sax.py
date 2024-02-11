@@ -4,25 +4,37 @@
 """Kernel SAX (K-SAX) is a kernel-based symbolic aggregate approximation technique for time series data."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import Tuple
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import NullFormatter
-
-from tqts.quantizer.paa import PAA
-from tqts.quantizer.lloyd_max import LloydMaxQuantizer
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.interpolate import interp1d
 from sklearn.neighbors import KernelDensity
 
+from tqts.quantizer.lloyd_max import LloydMaxQuantizer
+from tqts.quantizer.paa import PAA
+from tqts.utils.data_utils import generate_timestamps
 from tqts.utils.quantizer_utils import calculate_quantile_levels, find_symbol
-from tqts.utils.data_utils import text_to_df, generate_timestamps
 
 
 class KernelSAX:
+    """Kernel SAX (K-SAX) is a kernel-based symbolic aggregate approximation technique for time series data.
+
+    Args:
+        kernel (str, optional): Type of kernel to use for kernel density estimation. Defaults to "gaussian".
+        n_alphabet (int, optional): Number of alphabets to use. Defaults to 7.
+        bandwidth (float, optional): Bandwidth for the kernel density estimation. Defaults to 3.
+        boundary_estimator (str, optional): Method to use for estimating the boundaries. Defaults to "lloyd-max".
+        epochs (int, optional): Number of epochs for the Lloyd-Max quantizer. Defaults to 100.
+        random_state (int, optional): Random state for reproducibility. Defaults to 42.
+        paa_window_size (int, optional): Window size for Piecewise Aggregate Approximation (PAA). Defaults to 4.
+    """
+
     def __init__(
         self,
         kernel: str = "gaussian",

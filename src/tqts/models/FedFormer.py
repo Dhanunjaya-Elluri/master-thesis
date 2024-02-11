@@ -4,7 +4,7 @@
 """FedFormer Transformer Module"""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 from typing import Any
 
@@ -13,19 +13,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from tqts.models.layers.autocorrelation import AutoCorrelationLayer
-from tqts.models.layers.auxiliary import SeriesDeCompMulti, SeriesDeComp, MyLayerNorm
+from tqts.models.layers.auxiliary import MyLayerNorm, SeriesDeComp, SeriesDeCompMulti
 from tqts.models.layers.decoder import AutoDecoder, AutoDecoderLayer
 from tqts.models.layers.embedding import (
-    DataEmbedding_wo_pos,
     DataEmbedding,
+    DataEmbedding_wo_pos,
     DataEmbedding_wo_pos_temp,
     DataEmbedding_wo_temp,
 )
-from tqts.models.layers.encoder import AutoEncoderLayer, AutoEncoder
+from tqts.models.layers.encoder import AutoEncoder, AutoEncoderLayer
 from tqts.models.layers.fourier_correlation import FourierBlock, FourierCrossAttention
 from tqts.models.layers.multi_wavelet_corr import (
-    MultiWaveletTransform,
     MultiWaveletCross,
+    MultiWaveletTransform,
 )
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -181,7 +181,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.e_layers)
+                for _ in range(configs.e_layers)
             ],
             norm_layer=MyLayerNorm(configs.d_model),
         )
@@ -202,7 +202,7 @@ class Model(nn.Module):
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
-                for l in range(configs.d_layers)
+                for _ in range(configs.d_layers)
             ],
             norm_layer=MyLayerNorm(configs.d_model),
             projection=nn.Linear(configs.d_model, configs.c_out, bias=True),
@@ -236,9 +236,9 @@ class Model(nn.Module):
         """
         # decomp init
         mean = torch.mean(x_enc, dim=1).unsqueeze(1).repeat(1, self.pred_len, 1)
-        zeros = torch.zeros([x_dec.shape[0], self.pred_len, x_dec.shape[2]]).to(
-            device
-        )  # cuda()
+        # zeros = torch.zeros([x_dec.shape[0], self.pred_len, x_dec.shape[2]]).to(
+        #     device
+        # )  # cuda()
         seasonal_init, trend_init = self.de_comp(x_enc)
         # decoder input
         trend_init = torch.cat([trend_init[:, -self.label_len :, :], mean], dim=1)

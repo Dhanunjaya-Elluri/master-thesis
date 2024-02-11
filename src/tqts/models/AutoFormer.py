@@ -4,20 +4,20 @@
 """AutoFormer models."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
 
 
 import torch
 import torch.nn as nn
 
-from tqts.models.layers.autocorrelation import AutoCorrelationLayer, AutoCorrelation
-from tqts.models.layers.auxiliary import SeriesDeComp, MyLayerNorm
+from tqts.models.layers.autocorrelation import AutoCorrelation, AutoCorrelationLayer
+from tqts.models.layers.auxiliary import MyLayerNorm, SeriesDeComp
 from tqts.models.layers.decoder import AutoDecoder, AutoDecoderLayer
 from tqts.models.layers.embedding import (
-    DataEmbedding_wo_pos,
     DataEmbedding,
-    DataEmbedding_wo_temp,
+    DataEmbedding_wo_pos,
     DataEmbedding_wo_pos_temp,
+    DataEmbedding_wo_temp,
 )
 from tqts.models.layers.encoder import AutoEncoder, AutoEncoderLayer
 

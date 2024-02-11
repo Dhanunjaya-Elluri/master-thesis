@@ -4,11 +4,12 @@
 """Autocorrelation Layers for AutoFormer models."""
 
 __author__ = "Dhanunjaya Elluri"
-__mail__ = "dhanunjaya.elluri@tu-dortmund.de"
+__mail__ = "dhanunjayet@gmail.com"
+
+import math
 
 import torch
 import torch.nn as nn
-import math
 
 
 class AutoCorrelation(nn.Module):
