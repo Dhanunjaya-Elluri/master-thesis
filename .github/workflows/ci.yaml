@@ -50,7 +50,7 @@ jobs:
 
     - name: Code style compliance with isort
       run: |
-          python -m isort --check .
+          python -m isort --check . --profile black
 
     - name: Linting with flake8
       run: |
