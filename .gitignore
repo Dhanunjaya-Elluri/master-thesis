@@ -1,15 +1,15 @@
 .DS_Store
 playground
 src/*.egg-info
-<<<<<<< HEAD
 *.pyc
 *.pyo
 .pytest_cache/
 .idea/*
-=======
+
 __pycache__/
 *.py[cod]
 *$py.class
-.idea/
-.pytest_cache/
->>>>>>> master
+results
+logs
+gpu_results
+checkpoints
