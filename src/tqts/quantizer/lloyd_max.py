@@ -6,13 +6,17 @@
 __author__ = "Dhanunjaya Elluri"
 __mail__ = "dhanunjayet@gmail.com"
 
+import warnings
 from typing import Callable, Optional, Tuple
 
 import numpy as np
 from scipy import integrate
+from scipy.integrate import IntegrationWarning
 
 # constant for initialization method
 INIT_RANDOM = "random"
+
+warnings.filterwarnings("ignore", category=IntegrationWarning)
 
 
 class LloydMaxQuantizer:

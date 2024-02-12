@@ -52,11 +52,13 @@ class ETTHourDataset(Dataset):
         self.size = size
 
         if self.size is None:
-            self.seq_len = 24 // 4 * 4 * 4  # // int(self.freq[0])
-            self.label_len = 24 // 4 * 4
-            self.pred_len = 24 // 4 * 4
+            self.seq_len = (24 * 4 * 4) // 4
+            self.label_len = (24 * 4) // 4
+            self.pred_len = (24 * 4) // 4
         else:
-            self.seq_len, self.label_len, self.pred_len = self.size
+            self.seq_len = self.size[0] // 4
+            self.label_len = self.size[1] // 4
+            self.pred_len = self.size[2] // 4
 
         assert flag in ["train", "test", "val"], "Invalid dataset type."
         type_map = {"train": 0, "val": 1, "test": 2}
@@ -79,13 +81,13 @@ class ETTHourDataset(Dataset):
         # Adjust the borders based on the dataset size and frequency
         border1s = [
             0,
-            12 * 30 * (24 // 4) - self.seq_len,
-            12 * 30 * (24 // 4) + 4 * 30 * (24 // 4) - self.seq_len,
+            (12 * 30 * 24 - self.seq_len) // 4,
+            (12 * 30 * 24 + 4 * 30 * 24 - self.seq_len) // 4,
         ]
         border2s = [
-            12 * 30 * (24 // 4),
-            12 * 30 * (24 // 4) + 4 * 30 * (24 // 4),
-            12 * 30 * (24 // 4) + 8 * 30 * (24 // 4),
+            (12 * 30 * 24) // 4,
+            (12 * 30 * 24) // 4 + (4 * 30 * 24) // 4,
+            (12 * 30 * 24) // 4 + (8 * 30 * 24) // 4,
         ]
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
@@ -176,9 +178,9 @@ class ETTMinDataset(Dataset):
         self.size = size
 
         if self.size is None:
-            self.seq_len = 24 // 4 * 4 * 4  # // int(self.freq[0])
-            self.label_len = 24 // 4 * 4
-            self.pred_len = 24 // 4 * 4
+            self.seq_len = (24 * 4 * 4) // 4
+            self.label_len = (24 * 4) // 4
+            self.pred_len = (24 * 4) // 4
         else:
             self.seq_len, self.label_len, self.pred_len = self.size
 
@@ -202,21 +204,18 @@ class ETTMinDataset(Dataset):
 
         border1s = [
             0,
-            12 * 30 * (24 * 60 // 30) - self.seq_len,
-            # 12 months * 30 days * number of 30-min blocks in a day - seq_len
-            12 * 30 * (24 * 60 // 30)
-            + 4 * 30 * (24 * 60 // 30)
-            - self.seq_len,  # Same as above, extended by 4 months
+            (12 * 30 * 24 * 4 - self.seq_len) // 4,
+            # 12 months * 30 days * 24 hours * 4 15-min blocks in an hour
+            (12 * 30 * 24 * 4) // 4 + (4 * 30 * 24 * 4 - self.seq_len) // 4,
         ]
 
         border2s = [
-            12
-            * 30
-            * (24 * 60 // 30),  # 12 months * 30 days * number of 30-min blocks in a day
-            12 * 30 * (24 * 60 // 30)
-            + 4 * 30 * (24 * 60 // 30),  # Same as above, extended by 4 months
-            12 * 30 * (24 * 60 // 30)
-            + 8 * 30 * (24 * 60 // 30),  # Same as above, extended by another 4 months
+            (12 * 30 * 24 * 4)
+            // 4,  # 12 months * 30 days * 24 hours * 4 15-min blocks in an hour
+            (12 * 30 * 24 * 4) // 4
+            + (4 * 30 * 24 * 4) // 4,  # Same as above, extended by 4 months
+            (12 * 30 * 24 * 4) // 4
+            + (8 * 30 * 24 * 4) // 4,  # Same as above, extended by 8 months
         ]
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
@@ -299,11 +298,13 @@ class ETTHPredDataset(Dataset):
     ):
         # size [seq_len, label_len, pred_len]
         if size is None:
-            self.seq_len = 24 // 4 * 4 * 4
-            self.label_len = 24 // 4 * 4
-            self.pred_len = 24 // 4 * 4
+            self.seq_len = (24 * 4 * 4) // 4
+            self.label_len = (24 * 4) // 4
+            self.pred_len = (24 * 4) // 4
         else:
-            self.seq_len, self.label_len, self.pred_len = size
+            self.seq_len = size[0] // 4
+            self.label_len = size[1] // 4
+            self.pred_len = size[2] // 4
 
         assert flag in ["pred"], "Invalid dataset type."
 

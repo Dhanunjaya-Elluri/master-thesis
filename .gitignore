@@ -10,6 +10,6 @@ __pycache__/
 *$py.class
 /gpu_results/
 /results/
-/config/
 /checkpoints/
 /logs/
+/config/

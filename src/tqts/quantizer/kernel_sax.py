@@ -120,7 +120,9 @@ class KernelSAX:
             None
         """
         # Find the quantiles of the estimated density
-        density_interp = interp1d(x_d_flatten, density)
+        density_interp = interp1d(
+            x_d_flatten, density, kind="linear", bounds_error=False, fill_value=0
+        )
         quantizer = LloydMaxQuantizer(
             density_func=density_interp,
             n_codewords=self.n_alphabet,
@@ -253,18 +255,6 @@ class KernelSAX:
         """
         assert self.is_fitted, "fit() method must be called before saving codewords."
 
-        # Create a DataFrame for the boundaries and alphabets
-        boundary_df = pd.DataFrame(
-            {
-                "lower_boundaries": self.boundaries[:-1],
-                "upper_boundaries": self.boundaries[1:],
-                "alphabets": self.ascii_codes[: len(self.boundaries) - 1],
-            }
-        )
-        base, extension = csv_path.rsplit(".", 1)
-        boundary_df.to_csv(f"{base}_boundaries.{extension}", index=False)
-        print(f"Boundaries saved to {base}_boundaries.{extension}")
-
         timestamps = generate_timestamps(
             start_datetime, len(self.alphabets), self.paa_window_size
         )
@@ -293,6 +283,14 @@ class KernelSAX:
         )
         df.to_csv(csv_path, index=False)
         print(f"Generated codewords saved to {csv_path}")
+
+        # Save boundaries and alphabets from df to a csv file
+        boundaries_df = df[
+            ["lower_boundaries", "upper_boundaries", "alphabets"]
+        ].drop_duplicates()
+        base, extension = csv_path.rsplit(".", 1)
+        boundaries_df.to_csv(f"{base}_boundaries.{extension}", index=False)
+        print(f"Boundaries saved to {base}_boundaries.{extension}")
 
     def plot_with_boundaries(self, path: str, filename: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
