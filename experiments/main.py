@@ -10,8 +10,10 @@ import os
 import time
 import warnings
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -408,6 +410,22 @@ class ExpMain(ExpBasic):
             result_df.loc[mask, "True Characters"].apply(ord)
             - result_df.loc[mask, "Predicted Characters"].apply(ord)
         )
+
+        # Matching column creation as integer
+        result_df["Matching"] = (
+            result_df["True Characters"] == result_df["Predicted Characters"]
+        ).astype(int)
+
+        # Save Matching distribution plot to folder_path
+        sns.set_style("whitegrid")
+        plt.figure(figsize=(10, 6))
+        ax = sns.countplot(x="Matching", data=result_df)
+        # Set title with setting
+        ax.set_title(f"Matching Distribution of {setting}")
+        ax.set_xlabel("Match")
+        ax.set_ylabel("Count")
+        plt.legend(title="Match", labels=["No Match", "Match"])
+        plt.savefig(folder_path + "matching_distribution.png")
 
         # Save result_df to folder_path
         result_df.to_csv(folder_path + "result_df.csv", index=False)

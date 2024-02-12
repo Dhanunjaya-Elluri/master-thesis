@@ -11,17 +11,7 @@
 
 ## Transformers for quantized time series forecasting (Work in progress)
 
-The utilization of Transformer models [4], originally designed for natural language processing tasks,
-has garnered attention due to their remarkable ability to predict subsequent elements in a sequence.
-These models, often referred to as "stochastic parrots," have exhibited a profound mastery of learning
-sequential patterns, leading to text generation that closely mimics human-written content. This
-remarkable capacity suggests that Transformers might offer a powerful approach to time series forecasting,
-leveraging their inherent understanding of sequential dependencies.
-
-In the context of time series forecasting, accurate quantization holds significant potential. By representing continuous data as discrete symbols from a finite alphabet, the complexity of the input domain is reduced, simplifying the forecasting task. This reduction in complexity is particularly appealing for enhancing human interpretability, a crucial factor for the practical application of forecasting methods. Addressing this aspect could bridge the gap between advanced machine learning techniques and human comprehension, facilitating the adoption of cutting-edge forecasting methods in real-world scenarios.
-
-A crucial aspect pertains to the design of time-series-specific positional encodings within the context of quantization. As the focus shifts to a finite alphabet, novel positional encoding strategies could hold the key to capturing the essential temporal dynamics of the data. This exploration aligns with the objective of uncovering more efficient representations that align with the discrete nature of the quantized input domain. Moreover, the proposal aims to conduct a comparative analysis of two prominent quantization methods: Vanilla Symbolic Aggregate Approximation (SAX) [3] and Kernel SAX [1]. While Vanilla SAX assumes a normal distribution of data, Kernel SAX capitalizes on estimating data density for quantization. The flexibility of the Kernel SAX approach raises intriguing questions about its potential to outperform Vanilla SAX in terms of forecasting accuracy. Understanding the practical implications of these quantization methods could provide valuable insights into their applicability in diverse forecasting scenarios.
-
+This repository explores the use of Transformer models, traditionally applied in natural language processing, for time series forecasting. Transformers, known for learning sequential patterns and generating text akin to human writing, show promise in understanding and predicting time series data. The project focuses on quantizing continuous time series data into discrete symbols, simplifying the forecasting task and enhancing interpretability. It investigates novel positional encoding strategies for time-series data within quantized domains. Additionally, it compares two quantization methods: Vanilla Symbolic Aggregate Approximation (SAX) and Kernel SAX, the latter offering a flexible approach by estimating data density for quantization. This comparative analysis aims to reveal which method better suits various forecasting scenarios, combining advanced machine learning techniques with human interpretability for practical applications.
 ## Goal of the Thesis
 
 The primary goal of this thesis is to investigate and enhance the effectiveness of time series forecasting through a comprehensive exploration of quantization and transformative modeling techniques.
