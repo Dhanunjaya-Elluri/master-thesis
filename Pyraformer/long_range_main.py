@@ -12,18 +12,18 @@ import argparse
 import os
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from Pyraformer.utils.tools import TopkMSELoss, metric
-from tqts.utils.data_utils import vectorized_find_character
 from tqts.data.dataloader import ETTHourDataset, ETTMinDataset
+from tqts.utils.data_utils import vectorized_find_character
 
 
 def prepare_dataloader(args):
@@ -271,13 +271,11 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     print(preds.shape)
     trues = np.concatenate(trues, axis=0)
 
-    folder_path = "./results/" + opt.model + '_' + str(iter_index) + '/'
+    folder_path = "./results/" + opt.model + "_" + str(iter_index) + "/"
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-    boundaries_df = pd.read_csv(
-        os.path.join(opt.root_path, opt.boundaries_df)
-    )
+    boundaries_df = pd.read_csv(os.path.join(opt.root_path, opt.boundaries_df))
     true_values_flat = trues.flatten()
     pred_values_flat = preds.flatten()
 
@@ -314,7 +312,7 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
 
     # Matching column creation as integer
     result_df["Matching"] = (
-            result_df["True Characters"] == result_df["Predicted Characters"]
+        result_df["True Characters"] == result_df["Predicted Characters"]
     ).astype(int)
 
     # Save Matching distribution plot to folder_path
@@ -338,7 +336,6 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     np.savetxt(
         folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
     )
-
 
     print("test shape:{}".format(preds.shape))
     mae, mse, rmse, mape, mspe = metric(preds, trues)
@@ -439,7 +436,9 @@ def parse_args():
     parser.add_argument(
         "-root_path", type=str, default="../data", help="root path of the data file"
     )
-    parser.add_argument("-data_path", type=str, default="ETT-small/ETTh1_lloyd.csv", help="data file")
+    parser.add_argument(
+        "-data_path", type=str, default="ETT-small/ETTh1_lloyd.csv", help="data file"
+    )
     parser.add_argument(
         "-boundaries_df",
         type=str,
