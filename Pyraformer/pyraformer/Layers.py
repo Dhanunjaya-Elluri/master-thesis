@@ -12,8 +12,8 @@ from typing import List, Tuple, Union
 import torch
 from torch import nn
 
-from Pyraformer.pyraformer.embed import CustomEmbedding, DataEmbedding
-from Pyraformer.pyraformer.SubLayers import MultiHeadAttention, PositionwiseFeedForward
+from pyraformer.embed import CustomEmbedding, DataEmbedding
+from pyraformer.SubLayers import MultiHeadAttention, PositionwiseFeedForward
 
 
 def get_mask(
@@ -726,7 +726,7 @@ class Predictor(nn.Module):
     """
 
     def __init__(self, dim: int, num_types: int):
-        super(Predictor).__init__()
+        super(Predictor, self).__init__()
 
         self.linear = nn.Linear(dim, num_types, bias=False)
         nn.init.xavier_normal_(self.linear.weight)

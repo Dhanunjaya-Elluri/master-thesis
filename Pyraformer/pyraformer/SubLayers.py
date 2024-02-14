@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from Pyraformer.pyraformer.Modules import ScaledDotProductAttention
+from pyraformer.Modules import ScaledDotProductAttention
 
 
 class MultiHeadAttention(nn.Module):

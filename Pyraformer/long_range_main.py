@@ -20,10 +20,11 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
-from Pyraformer.utils.tools import TopkMSELoss, metric
 from tqts.data.dataloader import ETTHourDataset, ETTMinDataset
 from tqts.utils.data_utils import vectorized_find_character
+
+import pyraformer.Pyraformer_LR as Pyraformer
+from utils.tools import TopkMSELoss, metric
 
 
 def prepare_dataloader(args):
@@ -51,8 +52,6 @@ def prepare_dataloader(args):
         data_path=args.data_path,
         flag="train",
         size=[args.input_size, args.predict_step],
-        inverse=args.inverse,
-        dataset=args.data,
     )
     print("train", len(train_set))
     train_loader = DataLoader(
@@ -72,8 +71,6 @@ def prepare_dataloader(args):
         data_path=args.data_path,
         flag="test",
         size=[args.input_size, args.predict_step],
-        inverse=args.inverse,
-        dataset=args.data,
     )
     print("test", len(test_set))
     test_loader = DataLoader(
@@ -484,7 +481,7 @@ def parse_args():
         "-inner_size", type=int, default=3
     )  # The number of ajacent nodes.
     # CSCM structure. selection: [Bottleneck_Construct, Conv_Construct, MaxPooling_Construct, AvgPooling_Construct]
-    parser.add_argument("-CSCM", type=str, default="Bottleneck_Construct")
+    parser.add_argument("-CSCM", type=str, default="BottleneckConstruct")
     parser.add_argument(
         "-truncate", action="store_true", default=False
     )  # Whether to remove coarse-scale nodes from the attention structure

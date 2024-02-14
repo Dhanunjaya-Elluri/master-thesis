@@ -10,10 +10,14 @@ __mail__ = "dhanunjayet@gmail.com"
 import torch
 import torch.nn as nn
 
-from Pyraformer.pyraformer.embed import DataEmbedding
-from Pyraformer.pyraformer.Layers import (
+from pyraformer.embed import DataEmbedding
+from pyraformer.Layers import (
+    AvgPoolingConstruct,
+    BottleneckConstruct,
+    ConvConstruct,
     Decoder,
     EncoderLayer,
+    MaxPoolingConstruct,
     Predictor,
     get_k_q,
     get_mask,
