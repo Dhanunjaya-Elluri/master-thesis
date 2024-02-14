@@ -15,7 +15,6 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pyraformer.Pyraformer_LR as Pyraformer
 import seaborn as sns
 import torch
 import torch.optim as optim
@@ -23,6 +22,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric
 
+import pyraformer.Pyraformer_LR as Pyraformer
 from tqts.data.dataloader import ETTHourDataset, ETTMinDataset
 from tqts.utils.data_utils import vectorized_find_character
 
