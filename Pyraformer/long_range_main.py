@@ -12,7 +12,10 @@ import argparse
 import os
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -20,6 +23,7 @@ from tqdm import tqdm
 
 from Pyraformer.utils.tools import TopkMSELoss, metric
 from tqts.data.dataloader import ETTHourDataset, ETTMinDataset
+from tqts.utils.data_utils import vectorized_find_character
 
 
 def prepare_dataloader(args):
@@ -218,7 +222,7 @@ def train_epoch(model, train_dataset, training_loader, optimizer, opt, epoch):
     return total_loss / total_pred_number
 
 
-def eval_epoch(model, test_dataset, test_loader, opt, epoch):
+def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     """Epoch operation in evaluation phase."""
 
     model.eval()
@@ -266,8 +270,73 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch):
     preds = np.concatenate(preds, axis=0)
     print(preds.shape)
     trues = np.concatenate(trues, axis=0)
-    # np.save('./results/' + 'pred.npy', preds)
-    # np.save('./results/'+ 'true.npy', trues)
+
+    folder_path = "./results/" + opt.model + "_" + str(iter_index) + "/"
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    boundaries_df = pd.read_csv(os.path.join(opt.root_path, opt.boundaries_df))
+    true_values_flat = trues.flatten()
+    pred_values_flat = preds.flatten()
+
+    # Converting boundaries and alphabets to numpy arrays for vectorized operations
+    lower_boundaries = boundaries_df["lower_boundaries"].to_numpy()
+    upper_boundaries = boundaries_df["upper_boundaries"].to_numpy()
+    alphabets = boundaries_df["alphabets"].to_numpy()
+
+    # Applying the function to true and predicted values
+    true_characters_vec = vectorized_find_character(
+        true_values_flat, lower_boundaries, upper_boundaries, alphabets
+    )
+    pred_characters_vec = vectorized_find_character(
+        pred_values_flat, lower_boundaries, upper_boundaries, alphabets
+    )
+
+    # Create a new DataFrame with true values, predicted values, and their corresponding characters
+    result_df = pd.DataFrame(
+        {
+            "True Values": true_values_flat,
+            "Predicted Values": pred_values_flat,
+            "True Characters": true_characters_vec,
+            "Predicted Characters": pred_characters_vec,
+        }
+    )
+    # Calculating character distances
+    mask = (result_df["True Characters"].notna()) & (
+        result_df["Predicted Characters"].notna()
+    )
+    result_df["Character Distance"] = np.abs(
+        result_df.loc[mask, "True Characters"].apply(ord)
+        - result_df.loc[mask, "Predicted Characters"].apply(ord)
+    )
+
+    # Matching column creation as integer
+    result_df["Matching"] = (
+        result_df["True Characters"] == result_df["Predicted Characters"]
+    ).astype(int)
+
+    # Save Matching distribution plot to folder_path
+    sns.set_style("whitegrid")
+    plt.figure(figsize=(10, 6))
+    ax = sns.countplot(x="Matching", data=result_df)
+    # Set title with setting
+    ax.set_title(f"Matching Distribution of {opt.model} Iteration {iter_index}")
+    ax.set_xlabel("Match")
+    ax.set_ylabel("Count")
+    plt.legend(title="Match", labels=["No Match", "Match"])
+    plt.savefig(folder_path + "matching_distribution.png")
+
+    # Save result_df to folder_path
+    result_df.to_csv(folder_path + "result_df.csv", index=False)
+
+    # Computing the overall average character distance
+    average_distance_vec = np.mean(result_df["Character Distance"])
+
+    # save average_distance_vec to a text file in folder_path with float format
+    np.savetxt(
+        folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
+    )
+
     print("test shape:{}".format(preds.shape))
     mae, mse, rmse, mape, mspe = metric(preds, trues)
     print(
@@ -333,7 +402,7 @@ def train(model, optimizer, scheduler, opt, model_save_dir):
     return best_metrics
 
 
-def evaluate(model, opt, model_save_dir):
+def evaluate(model, opt, model_save_dir, iter_index):
     """Evaluate preptrained models"""
     best_mse = 100000000
 
@@ -345,7 +414,7 @@ def evaluate(model, opt, model_save_dir):
 
     best_metrics = []
     mse, mae, rmse, mape, mspe = eval_epoch(
-        model, test_dataset, test_dataloader, opt, 0
+        model, test_dataset, test_dataloader, opt, 0, iter_index
     )
 
     current_metrics = [float(mse), float(mae), float(rmse), float(mape), float(mspe)]
@@ -365,10 +434,17 @@ def parse_args():
     # Path parameters
     parser.add_argument("-data", type=str, default="ETTh1")
     parser.add_argument(
-        "-root_path", type=str, default="../dataset/", help="root path of the data file"
+        "-root_path", type=str, default="../data", help="root path of the data file"
     )
-    parser.add_argument("-data_path", type=str, default="ETTh1.csv", help="data file")
-
+    parser.add_argument(
+        "-data_path", type=str, default="ETT-small/ETTh1_lloyd.csv", help="data file"
+    )
+    parser.add_argument(
+        "-boundaries_df",
+        type=str,
+        default="ETT-small/ETTh1_lloyd_boundaries.csv",
+        help="boundaries dataset",
+    )
     # Dataloader parameters.
     parser.add_argument("-input_size", type=int, default=168)
     parser.add_argument("-predict_step", type=int, default=168)
@@ -446,7 +522,7 @@ def main(opt, iter_index):
     os.makedirs(model_save_dir, exist_ok=True)
     model_save_dir += "best_iter{}.pth".format(iter_index)
     if opt.eval:
-        best_metrics = evaluate(model, opt, model_save_dir)
+        best_metrics = evaluate(model, opt, model_save_dir, iter_index)
     else:
         """optimizer and scheduler"""
         optimizer = optim.Adam(

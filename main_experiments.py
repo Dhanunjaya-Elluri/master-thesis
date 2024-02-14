@@ -115,12 +115,12 @@ parser.add_argument(
     "--root_path", type=str, default="./data/", help="root path of the data file"
 )
 parser.add_argument(
-    "--data_path", type=str, default="ETTh1_lloyd.csv", help="data file"
+    "--data_path", type=str, default="ETT-small/ETTh1_lloyd.csv", help="data file"
 )
 parser.add_argument(
     "--boundaries_df",
     type=str,
-    default="ETTh1_lloyd_boundaries.csv",
+    default="ETT-small/ETTh1_lloyd_boundaries.csv",
     help="boundaries dataset type",
 )
 parser.add_argument(
