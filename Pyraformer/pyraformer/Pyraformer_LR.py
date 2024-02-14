@@ -9,7 +9,6 @@ __mail__ = "dhanunjayet@gmail.com"
 
 import torch
 import torch.nn as nn
-
 from pyraformer.embed import DataEmbedding
 from pyraformer.Layers import (
     AvgPoolingConstruct,
