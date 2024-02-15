@@ -56,9 +56,10 @@ class ETTHourDataset(Dataset):
             self.label_len = (24 * 4) // 4
             self.pred_len = (24 * 4) // 4
         else:
-            self.seq_len = self.size[0] // 4
-            self.label_len = self.size[1] // 4
-            self.pred_len = self.size[2] // 4
+            self.seq_len, self.label_len, self.pred_len = self.size
+            # self.seq_len = self.size[0] // 4
+            # self.label_len = self.size[1] // 4
+            # self.pred_len = self.size[2] // 4
 
         assert flag in ["train", "test", "val"], "Invalid dataset type."
         type_map = {"train": 0, "val": 1, "test": 2}

@@ -12,7 +12,6 @@ from typing import Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from pyraformer.Modules import ScaledDotProductAttention
 
 
@@ -103,10 +102,13 @@ class MultiHeadAttention(nn.Module):
         q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
 
         if mask is not None:
+            if len(mask.size()) == 2:
+                mask = mask.unsqueeze(1).unsqueeze(1)
             if len(mask.size()) == 3:
                 mask = mask.unsqueeze(1)  # For head axis broadcasting.
+            mask = mask.expand(q.size(0), q.size(1), q.size(2), q.size(3))
 
-        output, attn = self.attention(q, k, v, mask=mask)
+        output, attn = self.attention(q, k, v)
 
         # Transpose to move the head dimension back: b x lq x n x dv
         # Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)

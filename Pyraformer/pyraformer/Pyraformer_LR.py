@@ -9,7 +9,6 @@ __mail__ = "dhanunjayet@gmail.com"
 
 import torch
 import torch.nn as nn
-
 from pyraformer.embed import DataEmbedding
 from pyraformer.Layers import (
     AvgPoolingConstruct,
@@ -125,7 +124,7 @@ class Encoder(nn.Module):
         seq_enc = self.conv_layers(seq_enc)
 
         for i in range(len(self.layers)):
-            seq_enc, _ = self.layers[i](seq_enc, mask)
+            seq_enc, _ = self.layers[i](seq_enc)  # , mask)
 
         if self.decoder_type == "FC":
             indexes = self.indexes.repeat(seq_enc.size(0), 1, 1, seq_enc.size(2)).to(

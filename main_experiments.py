@@ -21,7 +21,7 @@ np.random.seed(fix_seed)
 
 
 parser = argparse.ArgumentParser(
-    description="[Autoformer, Transformer, LogTrans, Informer, FedFormer] Long Sequences Forecasting"
+    description="[Autoformer, Transformer, LogSparse, Informer, FedFormer] Long Sequences Forecasting"
 )
 
 # basic config
@@ -41,7 +41,7 @@ parser.add_argument(
     type=str,
     required=True,
     default="Autoformer",
-    help="models name, options: [Autoformer, Informer, Transformer, Logtrans, Fedformer]",
+    help="models name, options: [Autoformer, Informer, Transformer, LogSparse, Fedformer]",
 )
 
 # LogSparse

@@ -15,15 +15,15 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pyraformer.Pyraformer_LR as Pyraformer
 import seaborn as sns
 import torch
 import torch.optim as optim
+from dataloader import ETTHourDataset, ETTMinDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric
 
-import pyraformer.Pyraformer_LR as Pyraformer
-from tqts.data.dataloader import ETTHourDataset, ETTMinDataset
 from tqts.utils.data_utils import vectorized_find_character
 
 
@@ -98,10 +98,10 @@ def sample_mining_scheduler(epoch, batch_size):
 def dataset_parameters(args, dataset):
     """Prepare specific parameters for different datasets"""
     dataset2enc_in = {
-        "ETTh1": 7,
-        "ETTh2": 7,
-        "ETTm1": 7,
-        "ETTm2": 7,
+        "ETTh1": 1,
+        "ETTh2": 1,
+        "ETTm1": 1,
+        "ETTm2": 1,
         "electricity": 321,
         "exchange": 8,
         "traffic": 862,
@@ -111,10 +111,10 @@ def dataset_parameters(args, dataset):
         "synthetic": 1,
     }
     dataset2cov_size = {
-        "ETTh1": 4,
-        "ETTh2": 4,
-        "ETTm1": 4,
-        "ETTm2": 4,
+        "ETTh1": 1,
+        "ETTh2": 1,
+        "ETTm1": 1,
+        "ETTm2": 1,
         "electricity": 4,
         "exchange": 4,
         "traffic": 4,
@@ -173,7 +173,7 @@ def train_epoch(model, train_dataset, training_loader, optimizer, opt, epoch):
         training_loader, mininterval=2, desc="  - (Training)   ", leave=False
     ):
         # prepare data
-        batch_x, batch_y, batch_x_mark, batch_y_mark, mean, std = map(
+        batch_x, batch_y, batch_x_mark, batch_y_mark = map(
             lambda x: x.float().to(opt.device), batch
         )
         dec_inp = torch.zeros_like(batch_y).float()
@@ -203,10 +203,9 @@ def train_epoch(model, train_dataset, training_loader, optimizer, opt, epoch):
             criterion = torch.nn.MSELoss(reduction="none")
         # if inverse, both the output and the ground truth are denormalized.
         if opt.inverse:
-            outputs, batch_y = train_dataset.inverse_transform(
-                outputs, batch_y, mean, std
-            )
+            outputs, batch_y = train_dataset.inverse_transform(outputs, batch_y)
         # compute loss
+        print(f"outputs shape: {outputs.shape}, batch_y shape: {batch_y.shape}")
         losses = criterion(outputs, batch_y)
         loss = losses.mean()
         loss.backward()
@@ -231,7 +230,7 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
             test_loader, mininterval=2, desc="  - (Validation) ", leave=False
         ):
             """prepare data"""
-            batch_x, batch_y, batch_x_mark, batch_y_mark, mean, std = map(
+            batch_x, batch_y, batch_x_mark, batch_y_mark = map(
                 lambda x: x.float().to(opt.device), batch
             )
             dec_inp = torch.zeros_like(batch_y).float()
@@ -250,7 +249,8 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
             # if inverse, both the output and the ground truth are denormalized.
             if opt.inverse:
                 outputs, batch_y = test_dataset.inverse_transform(
-                    outputs, batch_y, mean, std
+                    outputs,
+                    batch_y,
                 )
 
             pred = outputs.detach().cpu().numpy()
@@ -259,9 +259,9 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
             preds.append(pred)
             trues.append(true)
 
-    preds = np.array(preds)
+    # preds = [pred.detach().cpu().numpy() for pred in preds] # np.array(preds)
 
-    trues = np.array(trues)
+    # trues = [true.detach().cpu().numpy() for true in trues] # np.array(trues)
     # preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
     # trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
     preds = np.concatenate(preds, axis=0)
@@ -315,24 +315,35 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     # Save Matching distribution plot to folder_path
     sns.set_style("whitegrid")
     plt.figure(figsize=(10, 6))
-    ax = sns.countplot(x="Matching", data=result_df)
-    # Set title with setting
-    ax.set_title(f"Matching Distribution of {opt.model} Iteration {iter_index}")
-    ax.set_xlabel("Match")
-    ax.set_ylabel("Count")
-    plt.legend(title="Match", labels=["No Match", "Match"])
+    countplot = sns.countplot(y=result_df["Character Distance"], palette="coolwarm")
+
+    # Adding the count values on the right side of the bars
+    for p in countplot.patches:
+        width = p.get_width()
+        plt.text(
+            width + 1,
+            p.get_y() + p.get_height() / 2.0,
+            "{:1.0f}".format(width),
+            ha="center",
+            va="center",
+        )
+
+    # Adding labels and title
+    plt.xlabel("Count")
+    plt.ylabel("Character Distance")
+    plt.title("Count of Each Character Distance")
     plt.savefig(folder_path + "matching_distribution.png")
 
     # Save result_df to folder_path
     result_df.to_csv(folder_path + "result_df.csv", index=False)
 
     # Computing the overall average character distance
-    average_distance_vec = np.mean(result_df["Character Distance"])
+    # average_distance_vec = np.mean(result_df["Character Distance"])
 
     # save average_distance_vec to a text file in folder_path with float format
-    np.savetxt(
-        folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
-    )
+    # np.savetxt(
+    #     folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
+    # )
 
     print("test shape:{}".format(preds.shape))
     mae, mse, rmse, mape, mspe = metric(preds, trues)
@@ -444,7 +455,7 @@ def parse_args():
     )
     # Dataloader parameters.
     parser.add_argument("-input_size", type=int, default=168)
-    parser.add_argument("-predict_step", type=int, default=168)
+    parser.add_argument("-predict_step", type=int, default=84)
     parser.add_argument(
         "-inverse", action="store_true", help="denormalize output data", default=False
     )
@@ -475,7 +486,7 @@ def parse_args():
 
     # Pyraformer parameters.
     parser.add_argument(
-        "-window_size", type=str, default="[4, 4, 4]"
+        "-window_size", type=str, default="[1, 1, 1]"
     )  # The number of children of a parent node.
     parser.add_argument(
         "-inner_size", type=int, default=3

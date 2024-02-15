@@ -12,8 +12,7 @@ from typing import List, Optional, Tuple
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
-
-from tqts.utils.time_feat import time_features
+from utils.timefeatures import time_features
 
 
 class ETTHourDataset(Dataset):
@@ -55,8 +54,8 @@ class ETTHourDataset(Dataset):
             self.seq_len = (24 * 4 * 4) // 4
             self.pred_len = (24 * 4) // 4
         else:
-            self.seq_len = self.size[0] // 4
-            self.pred_len = self.size[1] // 4
+            self.seq_len = self.size[0]
+            self.pred_len = self.size[1]
 
         assert flag in ["train", "test", "val"], "Invalid dataset type."
         type_map = {"train": 0, "val": 1, "test": 2}
@@ -104,9 +103,11 @@ class ETTHourDataset(Dataset):
             data = df_data.values
 
         df_stamp = df_raw[["timestamp"]][border1:border2]
-        df_stamp["timestamp"] = pd.to_datetime(df_stamp["timestamp"])
-
-        data_stamp = time_features(df_stamp, time_enc=self.time_enc, freq=self.freq)
+        df_stamp["date"] = pd.to_datetime(df_stamp["timestamp"])
+        # split frequency string into number and unit and get the string without the unit
+        if len(self.freq) > 1:
+            freq = self.freq[-1]
+        data_stamp = time_features(df_stamp, timeenc=self.time_enc, freq=freq)
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]

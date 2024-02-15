@@ -13,3 +13,8 @@ __pycache__/
 /checkpoints/
 /logs/
 /config/
+/test_results/
+/Pyraformer/results/
+/Pyraformer/models/
+/Pyraformer/logs/
+result.txt

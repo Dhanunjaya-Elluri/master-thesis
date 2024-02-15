@@ -42,7 +42,7 @@ class ExpMain(ExpBasic):
             "Autoformer": AutoFormer,
             "Transformer": Transformer,
             "Informer": Informer,
-            "Logtrans": LogSparse,
+            "LogSparse": LogSparse,
             "Fedformer": FedFormer,
         }
         model = model_dict[self.args.model].Model(self.args).float()
@@ -358,7 +358,7 @@ class ExpMain(ExpBasic):
         inputx = np.concatenate(inputx, axis=0)
 
         # result save
-        folder_path = "./results/" + setting + "/"
+        folder_path = "./results/exp_2/" + setting + "/"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -372,8 +372,8 @@ class ExpMain(ExpBasic):
         f.close()
 
         # np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe,rse, corr]))
-        np.save(folder_path + "pred.npy", preds)
-        np.save(folder_path + "true.npy", trues)
+        # np.save(folder_path + "pred.npy", preds)
+        # np.save(folder_path + "true.npy", trues)
         boundaries_df = pd.read_csv(
             os.path.join(self.args.root_path, self.args.boundaries_df)
         )
@@ -419,24 +419,35 @@ class ExpMain(ExpBasic):
         # Save Matching distribution plot to folder_path
         sns.set_style("whitegrid")
         plt.figure(figsize=(10, 6))
-        ax = sns.countplot(x="Matching", data=result_df)
-        # Set title with setting
-        ax.set_title(f"Matching Distribution of {setting}")
-        ax.set_xlabel("Match")
-        ax.set_ylabel("Count")
-        plt.legend(title="Match", labels=["No Match", "Match"])
+        countplot = sns.countplot(y=result_df["Character Distance"], palette="coolwarm")
+
+        # Adding the count values on the right side of the bars
+        for p in countplot.patches:
+            width = p.get_width()
+            plt.text(
+                width + 1,
+                p.get_y() + p.get_height() / 2.0,
+                "{:1.0f}".format(width),
+                ha="center",
+                va="center",
+            )
+
+        # Adding labels and title
+        plt.xlabel("Count")
+        plt.ylabel("Character Distance")
+        plt.title("Count of Each Character Distance")
         plt.savefig(folder_path + "matching_distribution.png")
 
         # Save result_df to folder_path
         result_df.to_csv(folder_path + "result_df.csv", index=False)
 
         # Computing the overall average character distance
-        average_distance_vec = np.mean(result_df["Character Distance"])
+        # average_distance_vec = np.mean(result_df["Character Distance"])
 
         # save average_distance_vec to a text file in folder_path with float format
-        np.savetxt(
-            folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
-        )
+        # np.savetxt(
+        #     folder_path + "average_distance_vec.txt", [average_distance_vec], fmt="%f"
+        # )
 
         # np.save(folder_path + 'x.npy', inputx)
         return

@@ -61,6 +61,7 @@ class TokenEmbedding(nn.Module):
             kernel_size=3,
             padding=padding,
             padding_mode="circular",
+            bias=False,
         )
         for module in self.modules():
             if isinstance(module, nn.Conv1d):
