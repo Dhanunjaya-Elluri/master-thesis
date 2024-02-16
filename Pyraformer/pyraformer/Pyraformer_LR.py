@@ -9,7 +9,7 @@ __mail__ = "dhanunjayet@gmail.com"
 
 import torch
 import torch.nn as nn
-from pyraformer.embed import DataEmbedding
+from pyraformer.embed import CustomEmbedding, DataEmbedding
 from pyraformer.Layers import (
     AvgPoolingConstruct,
     BottleneckConstruct,
@@ -99,7 +99,9 @@ class Encoder(nn.Module):
 
         if opt.embed_type == "CustomEmbedding":
             self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
-            # self.enc_embedding = CustomEmbedding(opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout)
+            # self.enc_embedding = CustomEmbedding(
+            #     opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout
+            # )
         else:
             self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
 

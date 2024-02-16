@@ -13,6 +13,9 @@ if [ ! -d "./logs/Embedding" ]; then
     mkdir ./logs/Embedding
 fi
 
+# Execute Pyraformer/scripts/Forecast.sh
+cd Pyraformer && bash scripts/Forecast.sh && cd ..
+
 for embed_type in 1 2 3 4
 do
 for model_name in Autoformer Informer Transformer Fedformer LogSparse

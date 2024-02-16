@@ -167,8 +167,8 @@ parser.add_argument(
 parser.add_argument(
     "--embed_type",
     type=int,
-    default=0,
-    help="0: default 1: value embedding + temporal embedding + positional embedding 2: value embedding + temporal embedding 3: value embedding + positional embedding 4: value embedding",
+    default=1,
+    help="1: value embedding + temporal embedding + positional embedding 2: value embedding + temporal embedding 3: value embedding + positional embedding 4: value embedding",
 )
 parser.add_argument(
     "--enc_in", type=int, default=1, help="encoder input size"

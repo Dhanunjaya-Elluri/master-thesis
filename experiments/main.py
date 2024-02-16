@@ -23,6 +23,7 @@ from tqts.data.datafactory import data_provider
 from tqts.models import AutoFormer, FedFormer, Informer, LogSparse, Transformer
 from tqts.utils.data_utils import vectorized_find_character
 from tqts.utils.metrics import metric
+from tqts.utils.plot_utils import save_matching_distribution_plot
 from tqts.utils.tools import (
     EarlyStopping,
     adjust_learning_rate,
@@ -358,7 +359,7 @@ class ExpMain(ExpBasic):
         inputx = np.concatenate(inputx, axis=0)
 
         # result save
-        folder_path = "./results/exp_2/" + setting + "/"
+        folder_path = "./results/" + setting + "/"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -417,26 +418,13 @@ class ExpMain(ExpBasic):
         ).astype(int)
 
         # Save Matching distribution plot to folder_path
-        sns.set_style("whitegrid")
-        plt.figure(figsize=(10, 6))
-        countplot = sns.countplot(y=result_df["Character Distance"], palette="coolwarm")
-
-        # Adding the count values on the right side of the bars
-        for p in countplot.patches:
-            width = p.get_width()
-            plt.text(
-                width + 1,
-                p.get_y() + p.get_height() / 2.0,
-                "{:1.0f}".format(width),
-                ha="center",
-                va="center",
-            )
-
-        # Adding labels and title
-        plt.xlabel("Count")
-        plt.ylabel("Character Distance")
-        plt.title("Count of Each Character Distance")
-        plt.savefig(folder_path + "matching_distribution.png")
+        save_matching_distribution_plot(
+            result_df,
+            folder_path,
+            self.args.data,
+            self.args.model,
+            self.args.embed_type,
+        )
 
         # Save result_df to folder_path
         result_df.to_csv(folder_path + "result_df.csv", index=False)

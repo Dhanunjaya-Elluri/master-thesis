@@ -11,12 +11,11 @@ Main function for training and evaluating the Pyraformer model on different time
 import argparse
 import os
 import time
+import warnings
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyraformer.Pyraformer_LR as Pyraformer
-import seaborn as sns
 import torch
 import torch.optim as optim
 from dataloader import ETTHourDataset, ETTMinDataset
@@ -25,6 +24,9 @@ from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric
 
 from tqts.utils.data_utils import vectorized_find_character
+from tqts.utils.plot_utils import save_matching_distribution_plot
+
+warnings.filterwarnings("ignore")
 
 
 def prepare_dataloader(args):
@@ -102,7 +104,7 @@ def dataset_parameters(args, dataset):
         "ETTh2": 1,
         "ETTm1": 1,
         "ETTm2": 1,
-        "electricity": 321,
+        "electricity": 1,
         "exchange": 8,
         "traffic": 862,
         "weather": 21,
@@ -115,7 +117,7 @@ def dataset_parameters(args, dataset):
         "ETTh2": 1,
         "ETTm1": 1,
         "ETTm2": 1,
-        "electricity": 4,
+        "electricity": 1,
         "exchange": 4,
         "traffic": 4,
         "weather": 4,
@@ -268,7 +270,7 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     print(preds.shape)
     trues = np.concatenate(trues, axis=0)
 
-    folder_path = "./results/" + opt.model + "_" + str(iter_index) + "/"
+    folder_path = "./results/" + opt.data + "_" + str(iter_index) + "/"
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
@@ -305,36 +307,14 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     result_df["Character Distance"] = np.abs(
         result_df.loc[mask, "True Characters"].apply(ord)
         - result_df.loc[mask, "Predicted Characters"].apply(ord)
-    )
+    ).astype(int)
 
     # Matching column creation as integer
     result_df["Matching"] = (
         result_df["True Characters"] == result_df["Predicted Characters"]
     ).astype(int)
 
-    # Save Matching distribution plot to folder_path
-    sns.set_style("whitegrid")
-    plt.figure(figsize=(10, 6))
-    countplot = sns.countplot(y=result_df["Character Distance"], palette="coolwarm")
-
-    # Adding the count values on the right side of the bars
-    for p in countplot.patches:
-        width = p.get_width()
-        plt.text(
-            width + 1,
-            p.get_y() + p.get_height() / 2.0,
-            "{:1.0f}".format(width),
-            ha="center",
-            va="center",
-        )
-
-    # Adding labels and title
-    plt.xlabel("Count")
-    plt.ylabel("Character Distance")
-    plt.title("Count of Each Character Distance")
-    plt.savefig(folder_path + "matching_distribution.png")
-
-    # Save result_df to folder_path
+    save_matching_distribution_plot(result_df, folder_path, opt.data, opt.model, None)
     result_df.to_csv(folder_path + "result_df.csv", index=False)
 
     # Computing the overall average character distance
@@ -467,7 +447,7 @@ def parse_args():
     )  # selection: [FC, attention]
 
     # Training parameters.
-    parser.add_argument("-epoch", type=int, default=5)
+    parser.add_argument("-epoch", type=int, default=10)
     parser.add_argument("-batch_size", type=int, default=32)
     parser.add_argument("-pretrain", action="store_true", default=False)
     parser.add_argument("-hard_sample_mining", action="store_true", default=False)
@@ -491,7 +471,7 @@ def parse_args():
     parser.add_argument(
         "-inner_size", type=int, default=3
     )  # The number of ajacent nodes.
-    # CSCM structure. selection: [Bottleneck_Construct, Conv_Construct, MaxPooling_Construct, AvgPooling_Construct]
+    # CSCM structure. selection: [BottleneckConstruct, ConvConstruct, MaxPoolingConstruct, AvgPoolingConstruct]
     parser.add_argument("-CSCM", type=str, default="BottleneckConstruct")
     parser.add_argument(
         "-truncate", action="store_true", default=False
