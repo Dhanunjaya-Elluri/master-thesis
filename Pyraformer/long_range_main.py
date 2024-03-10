@@ -34,6 +34,7 @@ def prepare_dataloader(args):
 
     data_dict = {
         "ETTh1": ETTHourDataset,
+        "ETTh1_stationary": ETTHourDataset,
         "ETTh2": ETTHourDataset,
         "ETTm1": ETTMinDataset,
         "ETTm2": ETTMinDataset,
@@ -101,6 +102,7 @@ def dataset_parameters(args, dataset):
     """Prepare specific parameters for different datasets"""
     dataset2enc_in = {
         "ETTh1": 1,
+        "ETTh1_stationary": 1,
         "ETTh2": 1,
         "ETTm1": 1,
         "ETTm2": 1,
@@ -114,6 +116,7 @@ def dataset_parameters(args, dataset):
     }
     dataset2cov_size = {
         "ETTh1": 1,
+        "ETTh1_stationary": 1,
         "ETTh2": 1,
         "ETTm1": 1,
         "ETTm2": 1,
@@ -128,6 +131,7 @@ def dataset_parameters(args, dataset):
     }
     dataset2seq_num = {
         "ETTh1": 1,
+        "ETTh1_stationary": 1,
         "ETTh2": 1,
         "ETTm1": 1,
         "ETTm2": 1,

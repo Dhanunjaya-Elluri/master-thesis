@@ -16,20 +16,20 @@ fi
 # Execute Pyraformer/scripts/Forecast.sh
 # cd Pyraformer && bash scripts/Forecast.sh && cd ..
 
-for embed_type in 4 # 1 2 3 4
+for embed_type in 1 2 3 4
 do
-for model_name in Fedformer # Autoformer Informer Transformer LogSparse
+for model_name in Fedformer Autoformer Informer Transformer LogSparse
 do
 for pred_len in 12
 do
   python -u main_experiments.py \
     --is_training 1 \
     --root_path ./data/ \
-    --data_path  ETTh1_lloyd_stationary.csv\
-    --boundaries_df ETTh1_lloyd_stationary_boundaries.csv\
+    --data_path  ETT-small/ETTh1_lloyd_stationary.csv\
+    --boundaries_df ETT-small/ETTh1_lloyd_stationary_boundaries.csv\
     --model_id ETTh1_lloyd_stationary_$pred_len \
     --model $model_name \
-    --data ETTh1 \
+    --data ETTh1_stationary \
     --features M \
     --seq_len 96 \
     --label_len 48 \

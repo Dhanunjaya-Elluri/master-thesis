@@ -13,6 +13,7 @@ from tqts.data.dataloader import ETTHourDataset, ETTHPredDataset, ETTMinDataset
 # Mapping of data identifiers to corresponding dataset classes
 data_dict = {
     "ETTh1": ETTHourDataset,
+    "ETTh1_stationary": ETTHourDataset,
     "ETTh2": ETTHourDataset,
     "ETTm1": ETTMinDataset,
     "ETTm2": ETTMinDataset,

@@ -16,6 +16,7 @@ def save_matching_distribution_plot(
     character_distance_counts = character_distance_counts.sort_values(
         by="Character Distance"
     )
+    mean = result_df["Character Distance"].mean()
 
     # Calculate the cumulative count and find the index for the 95% quantile
     total_count = character_distance_counts["Count"].sum()
@@ -61,6 +62,14 @@ def save_matching_distribution_plot(
         y = p.get_height()
         barplot.text(x, y, int(y), color="black", ha="center", va="bottom")
 
+    # Marking the mean
+    plt.axvline(
+        x=mean,
+        color="black",
+        linestyle="--",
+        label="Avg",
+        linewidth=1,
+    )
     # Marking the 95% quantile
     plt.axvline(
         x=quantile_85_index,
@@ -75,6 +84,13 @@ def save_matching_distribution_plot(
         linestyle="--",
         label="95% Quantile Line",
         linewidth=1,
+    )
+    plt.text(
+        mean,
+        plt.ylim()[1] * 0.9,
+        f"Mean\n({mean:.2f})",
+        color="black",
+        ha="left",
     )
     plt.text(
         quantile_85_index,
@@ -96,22 +112,29 @@ def save_matching_distribution_plot(
     if embed_type:
         if embed_type == 1:
             plt.title(
-                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Temporal + Positional"
+                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Temporal + Positional",
+                fontsize=16,
             )
         elif embed_type == 2:
             plt.title(
-                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Temporal"
+                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Temporal",
+                fontsize=16,
             )
         elif embed_type == 3:
             plt.title(
-                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Positional"
+                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token + Positional",
+                fontsize=16,
             )
         elif embed_type == 4:
             plt.title(
-                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token"
+                f"{model_name}: Char Distance Distribution for {data_name} with Embed Type: Token",
+                fontsize=16,
             )
     else:
-        plt.title(f"{model_name}: Char Distance Distribution for {data_name} dataset")
+        plt.title(
+            f"{model_name}: Char Distance Distribution for {data_name} dataset",
+            fontsize=16,
+        )
     plt.xticks()  # Rotate x-axis labels for better readability
 
     # Adding legend for the colors of the bars
@@ -150,6 +173,10 @@ def save_matching_distribution_plot(
             plt.Line2D(
                 [0], [0], color="red", linestyle="--", label="95% Quantile Line"
             ),
+            plt.Line2D(
+                [0], [0], color="blue", linestyle="--", label="85% Quantile Line"
+            ),
+            plt.Line2D([0], [0], color="black", linestyle="--", label="Avg"),
         ]
     )
     plt.savefig(folder_path + "matching_distribution.png")

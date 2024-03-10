@@ -34,9 +34,9 @@ do
 #     -predict_step $pred_len \
 #     -n_head 6 >../logs/LongForecasting/Pyraformer_ETTh1_$pred_len.log
 python long_range_main.py \
-    -data ETTh1 \
-    -data_path ./electricity/electricity_lloyd.csv \
-    -boundaries_df ./electricity/electricity_lloyd_boundaries.csv \
+    -data ETTh1_stationary \
+    -data_path ./ETT-small/ETTh1_lloyd_stationary.csv \
+    -boundaries_df ./ETT-small/ETTh1_lloyd_stationary_boundaries.csv \
     -embed_type $embed_type \
     -input_size 64 \
     -predict_step $pred_len \

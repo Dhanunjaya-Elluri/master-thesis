@@ -335,7 +335,7 @@ class KernelSAX:
         for boundary, color in zip(
             self.boundaries[1:-1], colors
         ):  # excluding the first and last, as they are -inf and inf
-            ax1.axhline(y=boundary, color=color, linestyle="--")
+            ax1.axhline(y=boundary, color="black", linestyle="--")
 
         # Create a divider for the existing axes instance
         divider = make_axes_locatable(ax1)
@@ -347,18 +347,18 @@ class KernelSAX:
         ax2.fill_betweenx(
             self.x_d_flatten, 0, self.density, color="lightsteelblue", alpha=0.5
         )
-        ax2.set_xlabel("Density")
+        ax2.set_xlabel("Density", fontsize=16)
 
         # Invert the x-axis for the density plot to have it visually make sense with the plot on the right
         ax2.invert_xaxis()
 
-        # Adding necessary plot details
-        ax1.set_title("Time Series with lloyd-max boundaries")
-        ax1.set_xlabel("Time")
-        ax1.set_ylabel("Value")
+        # Adding necessary plot details and add font size 10
+        ax1.set_title("Time Series with Lloyd-Max Boundaries", fontsize=16)
+        ax1.set_xlabel("Time", fontsize=16)
+        ax1.set_ylabel("Value", fontsize=16)
 
         # Adding legends and labels
-        ax1.legend(loc="upper left")
+        ax1.legend(loc="upper left", fontsize=16)
 
         # Show the plot
         plt.tight_layout()
