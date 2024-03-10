@@ -391,3 +391,123 @@ class SingleStepEmbedding(nn.Module):
         embedding += position_emb
 
         return embedding
+
+
+class DataEmbedding_wo_pos(nn.Module):
+    """
+    DataEmbedding is a neural network module for combining value, and temporal embeddings.
+
+    This module is designed for sequential data processing, particularly when time-related features are
+    important. It combines three different embeddings:
+    1. Value Embedding: Transforms the raw values to a higher dimensional space.
+    2. Temporal Embedding: Embeds time-related features (like time of day, day of week).
+
+    The output is a combination of these three embeddings, followed by dropout for regularization.
+
+    Args:
+        c_in (int): Number of input channels (features of the input data).
+        d_model (int): Dimensionality of the embedding.
+        dropout (float): Dropout rate for regularization. Default: 0.1.
+    """
+
+    def __init__(self, c_in: int, d_model: int, dropout: float = 0.1) -> None:
+        super(DataEmbedding_wo_pos, self).__init__()
+
+        # Initialize the various embeddings
+        self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
+        self.temporal_embedding = TimeFeatureEmbedding(d_model=d_model)
+
+        # Dropout layer for regularization
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x: Tensor, x_mark: Tensor) -> Tensor:
+        """
+        Forward pass of the DataEmbedding layer.
+
+        Args:
+            x (Tensor): The input tensor representing raw values.
+            x_mark (Tensor): The input tensor representing time-related features.
+
+        Returns:
+            Tensor: The combined embedding output after applying dropout.
+        """
+        x = self.value_embedding(x) + self.temporal_embedding(x_mark)
+        return self.dropout(x)
+
+
+class DataEmbedding_wo_temp(nn.Module):
+    """
+    DataEmbedding is a neural network module for combining value, positional embeddings.
+
+    This module is designed for sequential data processing, particularly when time-related features are
+    important. It combines two different embeddings:
+    1. Value Embedding: Transforms the raw values to a higher dimensional space.
+    2. Positional Embedding: Adds information about the position of each element in the sequence.
+
+    The output is a combination of these three embeddings, followed by dropout for regularization.
+
+    Args:
+        c_in (int): Number of input channels (features of the input data).
+        d_model (int): Dimensionality of the embedding.
+        dropout (float): Dropout rate for regularization. Default: 0.1.
+    """
+
+    def __init__(self, c_in: int, d_model: int, dropout: float = 0.1) -> None:
+        super(DataEmbedding_wo_temp, self).__init__()
+
+        # Initialize the various embeddings
+        self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
+        self.position_embedding = PositionalEmbedding(d_model=d_model)
+
+        # Dropout layer for regularization
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x: Tensor, x_mark: Tensor) -> Tensor:
+        """
+        Forward pass of the DataEmbedding layer.
+
+        Args:
+            x (Tensor): The input tensor representing raw values.
+            x_mark (Tensor): The input tensor representing time-related features.
+
+        Returns:
+            Tensor: The combined embedding output after applying dropout.
+        """
+        x = self.value_embedding(x) + self.position_embedding(x)
+        return self.dropout(x)
+
+
+class DataEmbedding_wo_pos_temp(nn.Module):
+    """
+    DataEmbedding_wo_pos_temp is a neural network module for value embeddings.
+
+    Value Embedding: Transforms the raw values to a higher dimensional space.
+
+    Args:
+        c_in (int): Number of input channels (features of the input data).
+        d_model (int): Dimensionality of the embedding.
+        dropout (float): Dropout rate for regularization. Default: 0.1.
+    """
+
+    def __init__(self, c_in: int, d_model: int, dropout: float = 0.1) -> None:
+        super(DataEmbedding_wo_pos_temp, self).__init__()
+
+        # Initialize the various embeddings
+        self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
+
+        # Dropout layer for regularization
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x: Tensor, x_mark: Tensor) -> Tensor:
+        """
+        Forward pass of the DataEmbedding layer.
+
+        Args:
+            x (Tensor): The input tensor representing raw values.
+            x_mark (Tensor): The input tensor representing time-related features.
+
+        Returns:
+            Tensor: The combined embedding output after applying dropout.
+        """
+        x = self.value_embedding(x)
+        return self.dropout(x)

@@ -159,7 +159,7 @@ def dataset_parameters(args, dataset):
     args.dec_in = dataset2enc_in[dataset]
     args.covariate_size = dataset2cov_size[dataset]
     args.seq_num = dataset2seq_num[dataset]
-    args.embed_type = dataset2embed[dataset]
+    # args.embed_type = dataset2embed[dataset]
 
     return args
 
@@ -270,7 +270,16 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
     print(preds.shape)
     trues = np.concatenate(trues, axis=0)
 
-    folder_path = "./results/" + opt.data + "_" + str(iter_index) + "/"
+    folder_path = (
+        "../results/"
+        + "et"
+        + str(opt.embed_type)
+        + "_Pyraformer_"
+        + opt.data
+        + "_"
+        + str(iter_index)
+        + "/"
+    )
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
@@ -314,7 +323,9 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
         result_df["True Characters"] == result_df["Predicted Characters"]
     ).astype(int)
 
-    save_matching_distribution_plot(result_df, folder_path, opt.data, opt.model, None)
+    save_matching_distribution_plot(
+        result_df, folder_path, opt.data, opt.model, opt.embed_type
+    )
     result_df.to_csv(folder_path + "result_df.csv", index=False)
 
     # Computing the overall average character distance
@@ -445,6 +456,7 @@ def parse_args():
     parser.add_argument(
         "-decoder", type=str, default="FC"
     )  # selection: [FC, attention]
+    parser.add_argument("-embed_type", type=int, default=1)
 
     # Training parameters.
     parser.add_argument("-epoch", type=int, default=10)

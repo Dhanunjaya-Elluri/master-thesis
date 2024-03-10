@@ -61,22 +61,7 @@ class Model(nn.Module):
         #                                           configs.dropout)
         # self.dec_embedding = DataEmbedding_wo_pos(configs.dec_in, configs.d_model, configs.embed, configs.freq,
         #                                           configs.dropout)
-        if configs.embed_type == 0:
-            self.enc_embedding = DataEmbedding_wo_pos(
-                configs.enc_in,
-                configs.d_model,
-                configs.embed,
-                configs.freq,
-                configs.dropout,
-            )
-            self.dec_embedding = DataEmbedding_wo_pos(
-                configs.dec_in,
-                configs.d_model,
-                configs.embed,
-                configs.freq,
-                configs.dropout,
-            )
-        elif configs.embed_type == 1:
+        if configs.embed_type == 1:
             self.enc_embedding = DataEmbedding(
                 configs.enc_in,
                 configs.d_model,
@@ -92,14 +77,14 @@ class Model(nn.Module):
                 configs.dropout,
             )
         elif configs.embed_type == 2:
-            self.enc_embedding = DataEmbedding_wo_pos_temp(
+            self.enc_embedding = DataEmbedding_wo_pos(
                 configs.enc_in,
                 configs.d_model,
                 configs.embed,
                 configs.freq,
                 configs.dropout,
             )
-            self.dec_embedding = DataEmbedding_wo_pos_temp(
+            self.dec_embedding = DataEmbedding_wo_pos(
                 configs.dec_in,
                 configs.d_model,
                 configs.embed,
@@ -115,6 +100,21 @@ class Model(nn.Module):
                 configs.dropout,
             )
             self.dec_embedding = DataEmbedding_wo_temp(
+                configs.dec_in,
+                configs.d_model,
+                configs.embed,
+                configs.freq,
+                configs.dropout,
+            )
+        elif configs.embed_type == 4:
+            self.enc_embedding = DataEmbedding_wo_pos_temp(
+                configs.enc_in,
+                configs.d_model,
+                configs.embed,
+                configs.freq,
+                configs.dropout,
+            )
+            self.dec_embedding = DataEmbedding_wo_pos_temp(
                 configs.dec_in,
                 configs.d_model,
                 configs.embed,

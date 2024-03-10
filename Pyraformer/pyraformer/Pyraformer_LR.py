@@ -9,7 +9,13 @@ __mail__ = "dhanunjayet@gmail.com"
 
 import torch
 import torch.nn as nn
-from pyraformer.embed import CustomEmbedding, DataEmbedding
+from pyraformer.embed import (
+    CustomEmbedding,
+    DataEmbedding,
+    DataEmbedding_wo_pos,
+    DataEmbedding_wo_pos_temp,
+    DataEmbedding_wo_temp,
+)
 from pyraformer.Layers import (
     AvgPoolingConstruct,
     BottleneckConstruct,
@@ -97,13 +103,27 @@ class Encoder(nn.Module):
                 ]
             )
 
-        if opt.embed_type == "CustomEmbedding":
+        # if opt.embed_type == "CustomEmbedding":
+        #     self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
+        #     # self.enc_embedding = CustomEmbedding(
+        #     #     opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout
+        #     # )
+        # else:
+        #     self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
+        if opt.embed_type == 1:
             self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
-            # self.enc_embedding = CustomEmbedding(
-            #     opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout
-            # )
-        else:
-            self.enc_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
+        elif opt.embed_type == 2:
+            self.enc_embedding = DataEmbedding_wo_pos(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
+        elif opt.embed_type == 3:
+            self.enc_embedding = DataEmbedding_wo_temp(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
+        elif opt.embed_type == 4:
+            self.enc_embedding = DataEmbedding_wo_pos_temp(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
 
         self.conv_layers = eval(opt.CSCM)(
             opt.d_model, opt.window_size, opt.d_bottleneck

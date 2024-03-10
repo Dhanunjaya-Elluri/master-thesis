@@ -10,7 +10,13 @@ import math
 from typing import List, Tuple, Union
 
 import torch
-from pyraformer.embed import CustomEmbedding, DataEmbedding
+from pyraformer.embed import (
+    CustomEmbedding,
+    DataEmbedding,
+    DataEmbedding_wo_pos,
+    DataEmbedding_wo_pos_temp,
+    DataEmbedding_wo_temp,
+)
 from pyraformer.SubLayers import MultiHeadAttention, PositionwiseFeedForward
 from torch import nn
 
@@ -791,12 +797,26 @@ class Decoder(nn.Module):
         )
 
         # Initialize embedding layer based on the specified type
-        if opt.embed_type == "CustomEmbedding":
-            self.dec_embedding = CustomEmbedding(
-                opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout
-            )
-        else:
+        # if opt.embed_type == "CustomEmbedding":
+        #     self.dec_embedding = CustomEmbedding(
+        #         opt.enc_in, opt.d_model, opt.covariate_size, opt.seq_num, opt.dropout
+        #     )
+        # else:
+        #     self.dec_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
+        if opt.embed_type == 1:
             self.dec_embedding = DataEmbedding(opt.enc_in, opt.d_model, opt.dropout)
+        elif opt.embed_type == 2:
+            self.dec_embedding = DataEmbedding_wo_pos(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
+        elif opt.embed_type == 3:
+            self.dec_embedding = DataEmbedding_wo_temp(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
+        elif opt.embed_type == 4:
+            self.dec_embedding = DataEmbedding_wo_pos_temp(
+                opt.enc_in, opt.d_model, opt.dropout
+            )
 
     def forward(
         self, x_dec: torch.Tensor, x_mark_dec: torch.Tensor, refer: torch.Tensor

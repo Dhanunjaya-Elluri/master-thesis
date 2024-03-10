@@ -14,13 +14,13 @@ if [ ! -d "./logs/Embedding" ]; then
 fi
 
 # Execute Pyraformer/scripts/Forecast.sh
-cd Pyraformer && bash scripts/Forecast.sh && cd ..
+# cd Pyraformer && bash scripts/Forecast.sh && cd ..
 
-for embed_type in 1 2 3 4
+for embed_type in 4 # 1 2 3 4
 do
-for model_name in Autoformer Informer Transformer Fedformer LogSparse
+for model_name in Fedformer # Autoformer Informer Transformer LogSparse
 do
-for pred_len in 48
+for pred_len in 12
 do
   python -u main_experiments.py \
     --is_training 1 \
@@ -31,7 +31,7 @@ do
     --model $model_name \
     --data ETTh1 \
     --features M \
-    --seq_len 384 \
+    --seq_len 96 \
     --label_len 48 \
     --pred_len $pred_len \
     --e_layers 4 \
