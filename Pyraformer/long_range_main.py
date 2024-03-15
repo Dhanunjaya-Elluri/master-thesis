@@ -15,14 +15,14 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import pyraformer.Pyraformer_LR as Pyraformer
 import torch
 import torch.optim as optim
-from dataloader import ETTHourDataset, ETTMinDataset
+from dataloader import ETTDailyDataset, ETTHourDataset, ETTMinDataset, ETTWeekDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric
 
-import pyraformer.Pyraformer_LR as Pyraformer
 from tqts.utils.data_utils import vectorized_find_character
 from tqts.utils.plot_utils import save_matching_distribution_plot
 
@@ -37,20 +37,20 @@ def prepare_dataloader(args):
         "ETTh1_stationary": ETTHourDataset,
         "ETTh2": ETTHourDataset,
         "ETTh2_stationary": ETTHourDataset,
-        "ETTm1": ETTMinDataset,
-        "ETTm1_stationary": ETTMinDataset,
-        "ETTm2": ETTMinDataset,
-        "ETTm2_stationary": ETTMinDataset,
+        "ETTm1": ETTHourDataset,
+        "ETTm1_stationary": ETTHourDataset,
+        "ETTm2": ETTHourDataset,
+        "ETTm2_stationary": ETTHourDataset,
         "electricity": ETTHourDataset,
         "electricity_stationary": ETTHourDataset,
-        "exchange": ETTHourDataset,
-        "exchange_stationary": ETTHourDataset,
+        "exchange_rate": ETTDailyDataset,
+        "exchange_rate_stationary": ETTDailyDataset,
         "traffic": ETTHourDataset,
         "traffic_stationary": ETTHourDataset,
         "weather": ETTHourDataset,
         "weather_stationary": ETTHourDataset,
-        "ili": ETTHourDataset,
-        "ili_stationary": ETTHourDataset,
+        "ili": ETTWeekDataset,
+        "ili_stationary": ETTWeekDataset,
     }
     Data = data_dict[args.data]
 
@@ -119,8 +119,8 @@ def dataset_parameters(args, dataset):
         "ETTm2_stationary": 1,
         "electricity": 1,
         "electricity_stationary": 1,
-        "exchange": 1,
-        "exchange_stationary": 1,
+        "exchange_rate": 1,
+        "exchange_rate_stationary": 1,
         "traffic": 1,
         "traffic_stationary": 1,
         "weather": 1,
@@ -139,8 +139,8 @@ def dataset_parameters(args, dataset):
         "ETTm2_stationary": 1,
         "electricity": 1,
         "electricity_stationary": 1,
-        "exchange": 4,
-        "exchange_stationary": 4,
+        "exchange_rate": 4,
+        "exchange_rate_stationary": 4,
         "traffic": 4,
         "traffic_stationary": 4,
         "weather": 4,
@@ -159,8 +159,8 @@ def dataset_parameters(args, dataset):
         "ETTm2_stationary": 1,
         "electricity": 1,
         "electricity_stationary": 1,
-        "exchange": 1,
-        "exchange_stationary": 1,
+        "exchange_rate": 1,
+        "exchange_rate_stationary": 1,
         "traffic": 1,
         "traffic_stationary": 1,
         "weather": 1,

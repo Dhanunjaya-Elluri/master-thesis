@@ -107,8 +107,8 @@ def save_matching_distribution_plot(
         ha="right",
     )
 
-    plt.xlabel("Character Distance between True and Predicted Values")
-    plt.ylabel("Count")
+    plt.xlabel("Character Distance between True and Predicted Values", fontsize=16)
+    plt.ylabel("Count", fontsize=16)
     if embed_type:
         if embed_type == 1:
             plt.title(

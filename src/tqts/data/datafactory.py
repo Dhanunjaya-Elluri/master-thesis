@@ -8,15 +8,33 @@ __mail__ = "dhanunjayet@gmail.com"
 
 from torch.utils.data import DataLoader
 
-from tqts.data.dataloader import ETTHourDataset, ETTHPredDataset, ETTMinDataset
+from tqts.data.dataloader import (
+    ETTDailyDataset,
+    ETTHourDataset,
+    ETTHPredDataset,
+    ETTWeekDataset,
+)
 
 # Mapping of data identifiers to corresponding dataset classes
 data_dict = {
     "ETTh1": ETTHourDataset,
     "ETTh1_stationary": ETTHourDataset,
     "ETTh2": ETTHourDataset,
-    "ETTm1": ETTMinDataset,
-    "ETTm2": ETTMinDataset,
+    "ETTh2_stationary": ETTHourDataset,
+    "ETTm1": ETTHourDataset,
+    "ETTm1_stationary": ETTHourDataset,
+    "ETTm2": ETTHourDataset,
+    "ETTm2_stationary": ETTHourDataset,
+    "electricity": ETTHourDataset,
+    "electricity_stationary": ETTHourDataset,
+    "exchange_rate": ETTDailyDataset,
+    "exchange_rate_stationary": ETTDailyDataset,
+    "traffic": ETTHourDataset,
+    "traffic_stationary": ETTHourDataset,
+    "weather": ETTHourDataset,
+    "weather_stationary": ETTHourDataset,
+    "ili": ETTWeekDataset,
+    "ili_stationary": ETTWeekDataset,
 }
 
 

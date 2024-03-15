@@ -16,188 +16,188 @@ fi
 #------------------------------------------
 # ETTm1 & ETTm2
 #------------------------------------------
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  ETT-small/ETTm1_ksax.csv\
-    --boundaries_df ETT-small/ETTm1_ksax_boundaries.csv\
-    --model_id ETTm1_ksax_$pred_len \
-    --model $model_name \
-    --data ETTm1 \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm1_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  ETT-small/ETTm1_ksax.csv\
+#     --boundaries_df ETT-small/ETTm1_ksax_boundaries.csv\
+#     --model_id ETTm1_ksax_$pred_len \
+#     --model $model_name \
+#     --data ETTm1 \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm1_ksax_'$pred_len.log
+# done
+# done
+# done
 
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  ETT-small/ETTm1_stationary_ksax.csv\
-    --boundaries_df ETT-small/ETTm1_stationary_ksax_boundaries.csv\
-    --model_id ETTm1_stationary_$pred_len \
-    --model $model_name \
-    --data ETTm1_stationary \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm1_stationary_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  ETT-small/ETTm1_stationary_ksax.csv\
+#     --boundaries_df ETT-small/ETTm1_stationary_ksax_boundaries.csv\
+#     --model_id ETTm1_stationary_$pred_len \
+#     --model $model_name \
+#     --data ETTm1_stationary \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm1_stationary_ksax_'$pred_len.log
+# done
+# done
+# done
 
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  ETT-small/ETTm2_ksax.csv\
-    --boundaries_df ETT-small/ETTm2_ksax_boundaries.csv\
-    --model_id ETTm2_ksax_$pred_len \
-    --model $model_name \
-    --data ETTm2 \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm2_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  ETT-small/ETTm2_ksax.csv\
+#     --boundaries_df ETT-small/ETTm2_ksax_boundaries.csv\
+#     --model_id ETTm2_ksax_$pred_len \
+#     --model $model_name \
+#     --data ETTm2 \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm2_ksax_'$pred_len.log
+# done
+# done
+# done
 
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  ETT-small/ETTm2_stationary_ksax.csv\
-    --boundaries_df ETT-small/ETTm2_stationary_ksax_boundaries.csv\
-    --model_id ETTm2_stationary_$pred_len \
-    --model $model_name \
-    --data ETTm2_stationary \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm2_stationary_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  ETT-small/ETTm2_stationary_ksax.csv\
+#     --boundaries_df ETT-small/ETTm2_stationary_ksax_boundaries.csv\
+#     --model_id ETTm2_stationary_$pred_len \
+#     --model $model_name \
+#     --data ETTm2_stationary \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_ETTm2_stationary_ksax_'$pred_len.log
+# done
+# done
+# done
 
-#------------------------------------------
-# Electricity
-#------------------------------------------
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  electricity/electricity_ksax.csv\
-    --boundaries_df electricity/electricity_ksax_boundaries.csv\
-    --model_id electricity_ksax_$pred_len \
-    --model $model_name \
-    --data electricity \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_electricity_ksax_'$pred_len.log
-done
-done
-done
+# #------------------------------------------
+# # Electricity
+# #------------------------------------------
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  electricity/electricity_ksax.csv\
+#     --boundaries_df electricity/electricity_ksax_boundaries.csv\
+#     --model_id electricity_ksax_$pred_len \
+#     --model $model_name \
+#     --data electricity \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_electricity_ksax_'$pred_len.log
+# done
+# done
+# done
 
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  electricity/electricity_stationary_ksax.csv\
-    --boundaries_df electricity/electricity_stationary_ksax_boundaries.csv\
-    --model_id electricity_stationary_$pred_len \
-    --model $model_name \
-    --data electricity_stationary \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_electricity_stationary_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  electricity/electricity_stationary_ksax.csv\
+#     --boundaries_df electricity/electricity_stationary_ksax_boundaries.csv\
+#     --model_id electricity_stationary_$pred_len \
+#     --model $model_name \
+#     --data electricity_stationary \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_electricity_stationary_ksax_'$pred_len.log
+# done
+# done
+# done
 
 #------------------------------------------
 # Exchange Rate
@@ -278,7 +278,7 @@ do
     --boundaries_df illness/illness_ksax_boundaries.csv\
     --model_id illness_ksax_$pred_len \
     --model $model_name \
-    --data illness \
+    --data ili \
     --features M \
     --seq_len 96 \
     --label_len 48 \
@@ -308,7 +308,7 @@ do
     --boundaries_df illness/illness_stationary_ksax_boundaries.csv\
     --model_id illness_stationary_$pred_len \
     --model $model_name \
-    --data illness_stationary \
+    --data ili_stationary \
     --features M \
     --seq_len 96 \
     --label_len 48 \
@@ -328,35 +328,35 @@ done
 #------------------------------------------
 # Traffic
 #------------------------------------------
-for embed_type in 1 2 3 4
-do
-for model_name in Fedformer Autoformer Informer Transformer LogSparse
-do
-for pred_len in 12
-do
-  python -u main_experiments.py \
-    --is_training 1 \
-    --root_path ./data/ \
-    --data_path  traffic/traffic_ksax.csv\
-    --boundaries_df traffic/traffic_ksax_boundaries.csv\
-    --model_id traffic_ksax_$pred_len \
-    --model $model_name \
-    --data traffic \
-    --features M \
-    --seq_len 96 \
-    --label_len 48 \
-    --pred_len $pred_len \
-    --e_layers 4 \
-    --d_layers 3 \
-    --factor 3 \
-    --enc_in 1 \
-    --dec_in 1 \
-    --c_out 1 \
-    --des 'Exp' \
-    --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_traffic_ksax_'$pred_len.log
-done
-done
-done
+# for embed_type in 1 2 3 4
+# do
+# for model_name in Fedformer Autoformer Informer Transformer LogSparse
+# do
+# for pred_len in 12
+# do
+#   python -u main_experiments.py \
+#     --is_training 1 \
+#     --root_path ./data/ \
+#     --data_path  traffic/traffic_ksax.csv\
+#     --boundaries_df traffic/traffic_ksax_boundaries.csv\
+#     --model_id traffic_ksax_$pred_len \
+#     --model $model_name \
+#     --data traffic \
+#     --features M \
+#     --seq_len 96 \
+#     --label_len 48 \
+#     --pred_len $pred_len \
+#     --e_layers 4 \
+#     --d_layers 3 \
+#     --factor 3 \
+#     --enc_in 1 \
+#     --dec_in 1 \
+#     --c_out 1 \
+#     --des 'Exp' \
+#     --itr 1  --embed_type $embed_type >logs/Embedding/$embed_type'_'$model_name'_traffic_ksax_'$pred_len.log
+# done
+# done
+# done
 
 for embed_type in 1 2 3 4
 do

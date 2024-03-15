@@ -11,9 +11,8 @@ import math
 
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor
-
 from pyraformer.hierarchical_mm_tvm import graph_mm as graph_mm_tvm
+from torch import Tensor
 
 
 class PyramidalAttention(nn.Module):
