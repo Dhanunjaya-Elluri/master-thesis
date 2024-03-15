@@ -317,8 +317,8 @@ class ETTWeekDataset(Dataset):
         if self.size is None:
             # self.seq_len = (24 * 4 * 4) // 4
             # self.pred_len = (24 * 4) // 4
-            self.seq_len = 52  # 2 weeks
-            self.pred_len = 52  # Next 2 weeks
+            self.seq_len = 6  # 2 weeks
+            self.pred_len = 2  # Next 2 weeks
         else:
             self.seq_len = self.size[0]
             self.pred_len = self.size[1]
@@ -352,8 +352,6 @@ class ETTWeekDataset(Dataset):
         #     (12 * 30 * 24) // 4 + (4 * 30 * 24) // 4,
         #     (12 * 30 * 24) // 4 + (8 * 30 * 24) // 4,
         # ]
-        # border1s = [0, 12 - self.seq_len, 12 - self.seq_len]
-        # border2s = [52, 12 + 4, 12 + 6]
         num_train = int(len(df_raw) * 0.7)
         num_test = int(len(df_raw) * 0.2)
         num_vali = len(df_raw) - num_train - num_test
@@ -378,9 +376,7 @@ class ETTWeekDataset(Dataset):
         df_stamp = df_raw[["timestamp"]][border1:border2]
         df_stamp["date"] = pd.to_datetime(df_stamp["timestamp"])
         # split frequency string into number and unit and get the string without the unit
-        if len(self.freq) > 1:
-            freq = self.freq[-1]
-        data_stamp = time_features(df_stamp, timeenc=self.time_enc, freq=freq)
+        data_stamp = time_features(df_stamp, timeenc=self.time_enc, freq=self.freq)
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]

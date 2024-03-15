@@ -18,7 +18,7 @@ import pandas as pd
 import pyraformer.Pyraformer_LR as Pyraformer
 import torch
 import torch.optim as optim
-from dataloader import ETTDailyDataset, ETTHourDataset, ETTMinDataset, ETTWeekDataset
+from dataloader import ETTDailyDataset, ETTHourDataset, ETTWeekDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric

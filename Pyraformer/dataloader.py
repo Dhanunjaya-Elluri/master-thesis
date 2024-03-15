@@ -316,8 +316,8 @@ class ETTWeekDataset(Dataset):
         if self.size is None:
             # self.seq_len = (24 * 4 * 4) // 4
             # self.pred_len = (24 * 4) // 4
-            self.seq_len = 52  # 2 weeks
-            self.pred_len = 52  # Next 2 weeks
+            self.seq_len = 6  # 2 weeks
+            self.pred_len = 2  # Next 2 weeks
         else:
             self.seq_len = self.size[0]
             self.pred_len = self.size[1]

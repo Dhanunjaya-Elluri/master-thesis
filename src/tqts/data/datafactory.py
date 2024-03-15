@@ -33,8 +33,8 @@ data_dict = {
     "traffic_stationary": ETTHourDataset,
     "weather": ETTHourDataset,
     "weather_stationary": ETTHourDataset,
-    "ili": ETTWeekDataset,
-    "ili_stationary": ETTWeekDataset,
+    "ili": ETTDailyDataset,
+    "ili_stationary": ETTDailyDataset,
 }
 
 
