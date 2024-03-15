@@ -10,15 +10,15 @@ import math
 from typing import List, Tuple, Union
 
 import torch
-from pyraformer.embed import (
-    CustomEmbedding,
+from torch import nn
+
+from .embed import (
     DataEmbedding,
     DataEmbedding_wo_pos,
     DataEmbedding_wo_pos_temp,
     DataEmbedding_wo_temp,
 )
-from pyraformer.SubLayers import MultiHeadAttention, PositionwiseFeedForward
-from torch import nn
+from .SubLayers import MultiHeadAttention, PositionwiseFeedForward
 
 
 def get_mask(

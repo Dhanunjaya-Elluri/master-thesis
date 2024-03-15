@@ -163,7 +163,9 @@ class KernelSAX:
         paa.fit(self.x)
         self.paa_series = paa.transform(self.x)
 
-        self.x_d_flatten, self.density = self._estimate_density(self.paa_series)
+        self.x_d_flatten, self.density = self._estimate_density(
+            self.x
+        )  # self.paa_series
 
         if self.boundary_estimator == "lloyd-max":
             self._calculate_lloyd_max_boundaries(self.x_d_flatten, self.density)
@@ -292,12 +294,13 @@ class KernelSAX:
         boundaries_df.to_csv(f"{base}_boundaries.{extension}", index=False)
         print(f"Boundaries saved to {base}_boundaries.{extension}")
 
-    def plot_with_boundaries(self, path: str, filename: str) -> None:
+    def plot_with_boundaries(self, path: str, filename: str, data_name: str) -> None:
         """Plot the PAA segments, assigned symbols, and density estimation.
 
         Args:
             path (str): Path to save the plot.
             filename (str): Name of the plot.
+            data_name (str): Name of the dataset.
 
         Returns:
             None
@@ -347,18 +350,21 @@ class KernelSAX:
         ax2.fill_betweenx(
             self.x_d_flatten, 0, self.density, color="lightsteelblue", alpha=0.5
         )
-        ax2.set_xlabel("Density", fontsize=16)
+        ax2.set_xlabel("Density", fontsize=18)
 
         # Invert the x-axis for the density plot to have it visually make sense with the plot on the right
         ax2.invert_xaxis()
 
         # Adding necessary plot details and add font size 10
-        ax1.set_title("Time Series with Lloyd-Max Boundaries", fontsize=16)
-        ax1.set_xlabel("Time", fontsize=16)
-        ax1.set_ylabel("Value", fontsize=16)
+        ax1.set_title(
+            f"{data_name} - Time Series with encoded words with PAA = {self.paa_window_size}",
+            fontsize=18,
+        )
+        ax1.set_xlabel("Time", fontsize=18)
+        ax1.set_ylabel("Value", fontsize=18)
 
         # Adding legends and labels
-        ax1.legend(loc="upper left", fontsize=16)
+        ax1.legend(loc="upper left", fontsize=12)
 
         # Show the plot
         plt.tight_layout()

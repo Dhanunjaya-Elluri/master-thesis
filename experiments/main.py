@@ -359,7 +359,7 @@ class ExpMain(ExpBasic):
         inputx = np.concatenate(inputx, axis=0)
 
         # result save
-        folder_path = "./results/" + setting + "/"
+        folder_path = "./results/" + self.args.data + "/" + setting + "/"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -508,7 +508,7 @@ class ExpMain(ExpBasic):
             preds = pred_data.inverse_transform(preds)
 
         # result save
-        folder_path = "./results/" + setting + "/"
+        folder_path = "./results/" + self.args.data + "/" + setting + "/"
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 

@@ -15,7 +15,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import pyraformer.Pyraformer_LR as Pyraformer
 import torch
 import torch.optim as optim
 from dataloader import ETTHourDataset, ETTMinDataset
@@ -23,6 +22,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.tools import TopkMSELoss, metric
 
+import pyraformer.Pyraformer_LR as Pyraformer
 from tqts.utils.data_utils import vectorized_find_character
 from tqts.utils.plot_utils import save_matching_distribution_plot
 
@@ -36,13 +36,21 @@ def prepare_dataloader(args):
         "ETTh1": ETTHourDataset,
         "ETTh1_stationary": ETTHourDataset,
         "ETTh2": ETTHourDataset,
+        "ETTh2_stationary": ETTHourDataset,
         "ETTm1": ETTMinDataset,
+        "ETTm1_stationary": ETTMinDataset,
         "ETTm2": ETTMinDataset,
+        "ETTm2_stationary": ETTMinDataset,
         "electricity": ETTHourDataset,
+        "electricity_stationary": ETTHourDataset,
         "exchange": ETTHourDataset,
+        "exchange_stationary": ETTHourDataset,
         "traffic": ETTHourDataset,
+        "traffic_stationary": ETTHourDataset,
         "weather": ETTHourDataset,
+        "weather_stationary": ETTHourDataset,
         "ili": ETTHourDataset,
+        "ili_stationary": ETTHourDataset,
     }
     Data = data_dict[args.data]
 
@@ -104,66 +112,67 @@ def dataset_parameters(args, dataset):
         "ETTh1": 1,
         "ETTh1_stationary": 1,
         "ETTh2": 1,
+        "ETTh2_stationary": 1,
         "ETTm1": 1,
+        "ETTm1_stationary": 1,
         "ETTm2": 1,
+        "ETTm2_stationary": 1,
         "electricity": 1,
-        "exchange": 8,
-        "traffic": 862,
-        "weather": 21,
-        "ili": 7,
-        "flow": 1,
-        "synthetic": 1,
+        "electricity_stationary": 1,
+        "exchange": 1,
+        "exchange_stationary": 1,
+        "traffic": 1,
+        "traffic_stationary": 1,
+        "weather": 1,
+        "weather_stationary": 1,
+        "ili": 1,
+        "ili_stationary": 1,
     }
     dataset2cov_size = {
         "ETTh1": 1,
         "ETTh1_stationary": 1,
         "ETTh2": 1,
+        "ETTh2_stationary": 1,
         "ETTm1": 1,
+        "ETTm1_stationary": 1,
         "ETTm2": 1,
+        "ETTm2_stationary": 1,
         "electricity": 1,
+        "electricity_stationary": 1,
         "exchange": 4,
+        "exchange_stationary": 4,
         "traffic": 4,
+        "traffic_stationary": 4,
         "weather": 4,
+        "weather_stationary": 4,
         "ili": 4,
-        "elect": 3,
-        "flow": 3,
-        "synthetic": 3,
+        "ili_stationary": 4,
     }
     dataset2seq_num = {
         "ETTh1": 1,
         "ETTh1_stationary": 1,
         "ETTh2": 1,
+        "ETTh2_stationary": 1,
         "ETTm1": 1,
+        "ETTm1_stationary": 1,
         "ETTm2": 1,
+        "ETTm2_stationary": 1,
         "electricity": 1,
+        "electricity_stationary": 1,
         "exchange": 1,
+        "exchange_stationary": 1,
         "traffic": 1,
+        "traffic_stationary": 1,
         "weather": 1,
+        "weather_stationary": 1,
         "ili": 1,
-        "elect": 321,
-        "flow": 1077,
-        "synthetic": 60,
-    }
-    dataset2embed = {
-        "ETTh1": "DataEmbedding",
-        "ETTh2": "DataEmbedding",
-        "ETTm1": "DataEmbedding",
-        "ETTm2": "DataEmbedding",
-        "elect": "CustomEmbedding",
-        "electricity": "CustomEmbedding",
-        "exchange": "CustomEmbedding",
-        "traffic": "CustomEmbedding",
-        "weather": "CustomEmbedding",
-        "ili": "CustomEmbedding",
-        "flow": "CustomEmbedding",
-        "synthetic": "CustomEmbedding",
+        "ili_stationary": 1,
     }
 
     args.enc_in = dataset2enc_in[dataset]
     args.dec_in = dataset2enc_in[dataset]
     args.covariate_size = dataset2cov_size[dataset]
     args.seq_num = dataset2seq_num[dataset]
-    # args.embed_type = dataset2embed[dataset]
 
     return args
 
@@ -276,6 +285,8 @@ def eval_epoch(model, test_dataset, test_loader, opt, epoch, iter_index=0):
 
     folder_path = (
         "../results/"
+        + opt.data
+        + "/"
         + "et"
         + str(opt.embed_type)
         + "_Pyraformer_"
