@@ -9,7 +9,7 @@
 
 # Master's Thesis
 
-## Transformers for quantized time series forecasting (Work in progress)
+## Transformers for quantized time series forecasting
 
 This repository explores the use of Transformer models, traditionally applied in natural language processing, for time series forecasting. Transformers, known for learning sequential patterns and generating text akin to human writing, show promise in understanding and predicting time series data. The project focuses on quantizing continuous time series data into discrete symbols, simplifying the forecasting task and enhancing interpretability. It investigates novel positional encoding strategies for time-series data within quantized domains. Additionally, it compares two quantization methods: Vanilla Symbolic Aggregate Approximation (SAX) and Kernel SAX, the latter offering a flexible approach by estimating data density for quantization. This comparative analysis aims to reveal which method better suits various forecasting scenarios, combining advanced machine learning techniques with human interpretability for practical applications.
 ## Goal of the Thesis
